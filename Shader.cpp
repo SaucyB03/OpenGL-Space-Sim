@@ -119,7 +119,7 @@ void Shader::setUniformMat4(const char *variableName, glm::mat4 &matrix) {
  * allows the program to access the vertex shader and pass a vec3 uniform
  * based off the variable name entered
  */
-void Shader::setVec3(const char *variableName, glm::vec3 &vector) {
+void Shader::setVec3(const char *variableName, glm::vec3 vector) {
     glUniform3f(glGetUniformLocation(this->program, variableName), vector.x, vector.y, vector.z);
 }
 

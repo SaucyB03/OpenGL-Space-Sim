@@ -15,45 +15,36 @@ using namespace std;
 const int SC_WIDTH = 1600;
 const int SC_HEIGHT = 1600;
 
-void checkInput(GLFWwindow *window, Object &object, float deltaTime){
+Camera* camera;
+
+void checkInput(GLFWwindow *window, float deltaTime){
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        //camera.move({0.0, 0.0, -1.0}, deltaTime);
-        object.setVelocity(glm::vec3(0.0,0.0,-0.75));
+        camera->move({0.0, 0.0, 1.0}, deltaTime);
+        //object.setVelocity(glm::vec3(0.0,0.0,-0.75));
     }else if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        //camera.move({0.0, 0.0, 1.0}, deltaTime);
-        object.setVelocity(glm::vec3(0.0,0.0,0.75));
+        camera->move({0.0, 0.0, -1.0}, deltaTime);
+        //object.setVelocity(glm::vec3(0.0,0.0,0.75));
     }else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        //camera.move({-1.0, 0.0, 0.0}, deltaTime);
-        object.setVelocity(glm::vec3(-0.75,0.0,0.0));
+        camera->move({-1.0, 0.0, 0.0}, deltaTime);
+        //object.setVelocity(glm::vec3(-0.75,0.0,0.0));
     }else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        //camera.move({1.0, 0.0, 0.0}, deltaTime);
-        object.setVelocity(glm::vec3(0.75,0.0,0.0));
-    }
-    else if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
-        object.setVelocity(glm::vec3(0.0,-0.75,0.0));
+        camera->move({1.0, 0.0, 0.0}, deltaTime);
+    }else if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
+        camera->move({0.0,-1.0,0.0}, deltaTime);
     }else if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-        object.setVelocity(glm::vec3(0.0,0.75,0.0));
-    }else{
-        object.setVelocity(glm::vec3(0.0,0.0,0.0));
-    }
-
-    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
-        object.setAngle({0,-0.1,0});
-    }else if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
-        object.setAngle({0.0,0.1,0});
-    }else if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
-        object.setAngle({-0.1,0.0,0});
-    }else if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
-        object.setAngle({0.1,0.0,0});
+        camera->move({0.0,1.0,0.0}, deltaTime);
     }
 
 }
 
+void mouseCallback(GLFWwindow *window, double x, double y){
+    camera->mouseCallback(window,x,y);
+}
 
 int main(){
     //Window initialization:
@@ -66,8 +57,8 @@ int main(){
     GLFWwindow* window;
     window = glfwCreateWindow(SC_WIDTH, SC_HEIGHT, "Basic Game", NULL, NULL);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     //make sure the window was created
     if (window == NULL)
@@ -89,11 +80,16 @@ int main(){
     glEnable(GL_DEPTH_TEST);
 
 
-    Shader* shader = new Shader("../vertexShader.glsl", "../fragmentShader.glsl");
-    Camera camera = *new Camera({0.0,0.0,3.0}, {0.0,0.0,-1.0},{0.0,1.0,0.0});
 
-    Object plane = *new Object(glm::vec3(0.5, 0.5,-1.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, 1.0f, true, SC_WIDTH, SC_HEIGHT);
-    Object plane2 = *new Object(glm::vec3(-0.5, 0.5,-3.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, 1.0f, true, SC_WIDTH, SC_HEIGHT);
+
+    Shader* shader = new Shader("../vertexLightSourceShader.glsl", "../fragmentLightSourceShader.glsl");
+    camera = new Camera({0.0,0.0,3.0}, {0.0,0.0,-1.0},{0.0,1.0,0.0});
+
+    vector<Object*> planets;
+    planets.push_back(new Object(glm::vec3(0.5, 0.5,-1.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(-0.5, 0.5,-3.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+
+    glfwSetCursorPosCallback(window, mouseCallback);
 
     glm::mat4 projection = glm::mat4(1.0f);
     auto startTime = std::chrono::high_resolution_clock::now();
@@ -108,20 +104,30 @@ int main(){
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        checkInput(window, plane, deltaTime);
+        checkInput(window, deltaTime);
 
         shader->bindShader();
 
-        projection = glm::perspective(glm::radians(45.0f), (float) SC_WIDTH / (float) SC_HEIGHT, 1.0f, 100.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float) SC_WIDTH / (float) SC_HEIGHT, 0.1f, 100.0f);
 
 
         shader->setUniformMat4("projection", projection);
-        camera.applyView(shader);
+        shader->setVec3("lightPos", planets.at(0)->getPosition());
+        camera->applyView(shader);
 
-        plane.move(deltaTime);
+        //plane.move(deltaTime);
 
-        plane.display(shader);
-        plane2.display(shader);
+//        int i,j;
+//        for(i = 0; i < planets.size(); ++i){
+//            for(j = 0; j < planets.size(); ++j){
+//                if(j != i){
+//                    planets.at(i)
+//                }
+//            }
+//        }
+
+        planets.at(0)->display(shader);
+        planets.at(1)->display(shader);
 
         //refresh the window
         glfwSwapBuffers(window);

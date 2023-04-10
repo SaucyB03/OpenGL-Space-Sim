@@ -21,17 +21,19 @@ void Object::assignBuffandArr(){
     //If its dynamic tell OpenGl to draw it dynamically otherwise it will remain static
     if(dynamic){
         glBindBuffer(GL_ARRAY_BUFFER, this->vb);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + textCords.size() * sizeof(float), 0, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + textCords.size() * sizeof(float) + normals.size() * sizeof(float), 0, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices.front());
         glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), textCords.size() * sizeof(float), &textCords.front());
+        glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + textCords.size() * sizeof(float), normals.size() * sizeof(float), &normals.front());
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eb);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), &indices.front(), GL_DYNAMIC_DRAW);
     }else {
         glBindBuffer(GL_ARRAY_BUFFER, this->vb);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + textCords.size() * sizeof(float), 0, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + textCords.size() * sizeof(float) + normals.size() * sizeof(float), 0, GL_STATIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices.front());
         glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), textCords.size() * sizeof(float), &textCords.front());
+        glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + textCords.size() * sizeof(float), normals.size() * sizeof(float), &normals.front());
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eb);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), &indices.front(), GL_STATIC_DRAW);
@@ -44,6 +46,9 @@ void Object::assignBuffandArr(){
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(vertices.size() * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(vertices.size() * sizeof(float) + textCords.size() * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
 
     // Unbinds the buffer and vertex array now that we are done with them
@@ -155,7 +160,7 @@ void Object::generateSphere() {
 
     subdivideSphere(radius);
 
-    //calculateTexCordsAndNormals(seam);
+    calculateNormals();
 }
 
 void Object::generateCube() {
@@ -227,6 +232,15 @@ void Object::generateCube() {
 
             2*uvScale,-uvScale
     };
+
+    calculateNormals();
+    cout << "Normals: " << endl;
+    for(int i = 0; i < normals.size(); ++i){
+        cout << normals.at(i) << ", ";
+        if((i+1) % 3 == 0){
+            cout << endl;
+        }
+    }
 }
 
 
@@ -348,9 +362,14 @@ void Object::addIndices(vector<int> &vector, glm::vec3 info) {
 }
 
 void Object::calculateNormals() {
-    int i;
-    for(i = 0; i < indices.size(); ++i){
+    for(int i = 0; i < vertices.size(); i += 3){
+        glm::vec3 vertPos = {vertices.at(i), vertices.at(i + 1), vertices.at(i + 2)};
 
+        vertPos.x = vertPos.x / scale.x;
+        vertPos.y = vertPos.y / scale.y;
+        vertPos.z = vertPos.z / scale.z;
+
+        addVerts(normals,vertPos);
     }
 }
 

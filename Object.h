@@ -31,6 +31,7 @@ private:
     glm::vec3 scale;
     glm::vec3 velocity;
     float mass;
+    glm::vec3 currentForce = glm::vec3(0.0f);
     glm::vec3 color;
     glm::vec3 angle = glm::vec3(0.0f);
     float uvScale;
@@ -77,6 +78,8 @@ public:
      * Applys any transformations the object has had and displays the object
      */
     void display(Shader* shader);
+
+    void addForce(glm::vec3 force);
 
     /*getPostion
      * returns the objects position as a vec2

@@ -56,7 +56,7 @@ public:
      * allows the program to access the vertex shader and pass a vec3 uniform
      * based off the variable name entered
      */
-    void setVec3(const char *variableName, glm::vec3 &vector);
+    void setVec3(const char *variableName, glm::vec3 vector);
     void setInt(const char *variableName, int integer);
 };
 

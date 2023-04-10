@@ -9,7 +9,12 @@ private:
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
     glm::mat4 view;
+    glm::vec3 angles = {-90,0.0,0.0};
     float speed = 2.5;
+
+    bool firstMouse = true;
+    float lastX = 0.0, lastY = 0.0;
+
 public:
     Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up);
     ~Camera();
@@ -17,6 +22,8 @@ public:
     void applyView(Shader* shader);
     void move(glm::vec3 move, float deltaTime);
     void lookAround();
+
+    void mouseCallback(GLFWwindow *window, double x, double y);
 
     template<typename T>
     void lookAt(T location);

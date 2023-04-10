@@ -19,11 +19,56 @@ void Camera::applyView(Shader* shader) {
 }
 
 void Camera::move(glm::vec3 move, float deltaTime) {
-    cameraPos += move * speed * deltaTime;
+    //float xyHyp = sqrt(move.x * move.x + move.y * move.y);
+
+//    cameraPos.x += (cameraPos.x * cos(glm::radians(angles.x)) - move.z * sin(glm::radians(angles.x)))  * speed * deltaTime;
+//    cameraPos.z += (move.x * sin(glm::radians(angles.x)) + move.z * cos(glm::radians(angles.x))) * speed * deltaTime;
+
+    cameraPos.x +=  (move.z * cos(glm::radians(angles.x)) - move.x * sin(glm::radians(angles.x))) * speed * deltaTime;
+    cameraPos.z +=  (move.z * sin(glm::radians(angles.x)) + move.x * cos(glm::radians(angles.x))) * speed * deltaTime;
+
+    cameraPos.y += move.y * speed * deltaTime;
+    //cameraPos += move  * speed * deltaTime;
 }
 
 void Camera::lookAround() {
 
+}
+
+
+void Camera::mouseCallback(GLFWwindow *window, double x, double y) {
+    float xpos = static_cast<float>(x);
+    float ypos = static_cast<float>(y);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    angles.x   += xoffset;
+    angles.y += yoffset;
+
+    if(angles.y > 89.0f)
+        angles.y = 89.0f;
+    if(angles.y < -89.0f)
+        angles.y = -89.0f;
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(angles.x)) * cos(glm::radians(angles.y));
+    direction.y = sin(glm::radians(angles.y));
+    direction.z = sin(glm::radians(angles.x)) * cos(glm::radians(angles.y));
+    cameraFront = glm::normalize(direction);
 }
 
 template<typename T>
