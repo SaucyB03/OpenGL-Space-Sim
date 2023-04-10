@@ -31,8 +31,8 @@ private:
     float mass;
     glm::vec3 color;
     float angle = 0.0f;
+    float uvScale;
 
-    int sphereSubdivisions = 2;
 
     vector<float> vertices;
     vector<int> indices;
@@ -53,7 +53,7 @@ private:
     void generateCube();
 
 
-    void subdivideSphere(float radius, vector<int> &seam);
+    void subdivideSphere(float radius);
     glm::vec3 findMidpoint(int vertex1, int vertex2, float radius);
     void calculateNormals();
 
@@ -63,7 +63,7 @@ public:
     /* Object Constructor
      * Holds info about: position, scale, velocity, color, if its dynamic / static, and the screen size
      */
-    Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, bool dynamic, int scWidth, int scHeight);
+    Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, float uvScale, bool dynamic, int scWidth, int scHeight);
     //Destructor: deletes the created buffers
     ~Object();
 

@@ -51,17 +51,17 @@ void Object::assignBuffandArr(){
     glBindVertexArray(0);
 
     glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    glCullFace(GL_FRONT);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
     // texture 1
     // ---------
-    string filename = "../textures/Ground047_4K_Color.jpg";
+    string filename = "../textures/UVMap.jpg";
 
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
-    // set the texture wrapping parameters
+    // set the texture wrapping parameters`
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
@@ -85,77 +85,105 @@ void Object::assignBuffandArr(){
 
 void Object::generateSphere() {
     float radius = scale.x/2;
-    vector<float> verts;
 
-    vector<int> seam = {0,1,6,12};
+    float phi, theta, LRot, x, y, z, tx = 0.0, ty = 0.0;
+    int i, index = 0;
+    for(i = 1; i <= 12; ++i) {
+        phi = atan(0.5f);
+        theta = 2 * M_PI / 5 * i - LRot;
 
-    //Initialize verts, since we know what the triangles will be prior to subdivision
-    indices = {
-            0,1,2,
-            0,2,3,
-            0,3,4,
-            0,4,5,
-            0,5,1,
-            1,5,6,
-            2,1,7,
-            3,2,8,
-            4,3,9,
-            5,4,10,
-            6,7,1,
-            7,8,2,
-            8,9,3,
-            9,10,4,
-            10,6,5,
-            11,7,6,
-            11,8,7,
-            11,9,8,
-            11,10,9,
-            11,6,10
-    };
+        if (i < 6) {
+            x = radius * cos(phi) * cos(theta);
+            y = radius * sin(phi);
+            z = radius * cos(phi) * sin(theta);
 
-    verts.push_back(0);
-    verts.push_back(scale.y/2);
-    verts.push_back(0);
-    float phi;
-    float theta;
-    int i;
-    for(i = 1; i < 11; ++i){
-        if(i < 6){
-            phi = atan(0.5f);
-            theta = 2*M_PI/5 * i;
+            addIndices(indices, {index + 1, index, index + 2});
+            addIndices(indices, {index + 2, index, index + 11});
+            addVerts(vertices, {x, y, z});
+            addVerts(vertices, {0.0, scale.y / 2, 0.0});
+
+            textCords.push_back(tx * uvScale);
+            textCords.push_back(ty * uvScale);
+            textCords.push_back((tx + 0.5f) * uvScale);
+            textCords.push_back((ty - 1.0f) * uvScale);
+
+            tx ++;
+
+            index += 2;
+        } else if (i > 6 && i < 12) {
+            x = radius * cos(-phi) * cos(theta);
+            y = radius * sin(-phi);
+            z = radius * cos(-phi) * sin(theta);
+
+            addIndices(indices, {index - 1, index, index + 1});
+            addIndices(indices, {index - 10, index - 1, index + 1});
+            addVerts(vertices, {x, y, z});
+            addVerts(vertices, {0.0, -scale.y / 2, 0.0});
+
+            textCords.push_back(tx * uvScale);
+            textCords.push_back(ty * uvScale);
+            textCords.push_back((tx + 0.5f) * uvScale);
+            textCords.push_back((ty + 1.0f) * uvScale);
+
+            tx ++;
+
+            index += 2;
+        } else if(i == 12){
+            x = radius * cos(-phi) * cos(theta);
+            y = radius * sin(-phi);
+            z = radius * cos(-phi) * sin(theta);
+
+            addVerts(vertices, {x, y, z});
+            textCords.push_back(tx * uvScale);
+            textCords.push_back(ty * uvScale);
         }else{
-            phi = -atan(0.5f);
-            theta = 2*M_PI/5 * i - M_PI/5;
+            x = radius * cos(phi) * cos(theta);
+            y = radius * sin(phi);
+            z = radius * cos(phi) * sin(theta);
+
+            addVerts(vertices, {x, y, z});
+            textCords.push_back(tx * uvScale);
+            textCords.push_back(ty * uvScale);
+
+            tx = 1.0;
+            ty = 1.0;
+
+            LRot = M_PI/5;
+            index += 2;
         }
-        float x = radius * cos(phi) * cos(theta);
-        float y = radius * sin(phi);
-        float z = radius * cos(phi) * sin(theta);
-
-        verts.push_back(x);
-        verts.push_back(y);
-        verts.push_back(z);
     }
-    verts.push_back(0);
-    verts.push_back(-scale.y/2);
-    verts.push_back(0);
 
-    vertices = verts;
-    cout << "pre sub vertices: {" << endl;
+    cout << "pre sub vertices size("<< vertices.size() << ") : {" << endl;
     for(i = 0; i < vertices.size(); ++i){
         cout << vertices.at(i) << ", ";
         if((i+1) % 3 == 0){
             cout << endl;
         }
     }
-    cout << "}\npre sub indices: {"<<endl;
+    cout << "}\npre sub texCords: {"<<endl;
+    for(i = 0; i < textCords.size(); ++i){
+        cout << textCords.at(i) << ", ";
+        if((i+1) % 2 == 0){
+            cout << endl;
+        }
+    }
+    cout << "indices length: " << indices.size() << endl;
+    //subdivideSphere(radius);
+    cout << "}\npost sub indices: {"<<endl;
     for(i = 0; i < indices.size(); ++i){
         cout << indices.at(i) << ", ";
         if((i+1) % 3 == 0){
             cout << endl;
         }
     }
-    cout << "indices length: " << indices.size() << endl;
-    subdivideSphere(radius, seam);
+    cout << "}\npost sub texCords: {"<<endl;
+    for(i = 0; i < textCords.size(); ++i){
+        cout << textCords.at(i) << ", ";
+        if((i+1) % 2 == 0){
+            cout << endl;
+        }
+    }
+    //calculateTexCordsAndNormals(seam);
 }
 
 void Object::generateCube() {
@@ -192,56 +220,53 @@ void Object::generateCube() {
 
     };
     indices = {
-            1, 3, 0,  // first Triangle
-            3, 1, 2,   // second Triangle
-            6, 4, 7,
-            4, 6, 5,
-            9, 4, 5,
-            4, 9, 8,
-            6, 13, 12,
-            13, 6, 7,
-            3, 4, 0,
-            4, 3, 7,
-            10, 6, 11,
-            6, 10, 5
+            3, 1, 0,  // first Triangle
+            1, 3, 2,   // second Triangle
+            4, 6, 7,
+            6, 4, 5,
+            4, 9, 5,
+            9, 4, 8,
+            13, 6, 12,
+            6, 13, 7,
+            4, 3, 0,
+            3, 4, 7,
+            6, 10, 11,
+            10, 6, 5
     };
 
     textCords = {
-            1.0,1.0,
-            0.0,1.0,
+            uvScale,uvScale,
+            0.0,uvScale,
             0.0,0.0,
-            1.0,0.0,
+            uvScale,0.0,
 
-            2.0,1.0,
-            3.0,1.0,
-            3.0,0.0,
-            2.0,0.0,
+            2*uvScale,uvScale,
+            3*uvScale,uvScale,
+            3*uvScale,0.0,
+            2*uvScale,0.0,
 
-            2.0,2.0,
+            2*uvScale,2*uvScale,
 
-            3.0,2.0,
-            4.0,1.0,
+            3*uvScale,2*uvScale,
+            4*uvScale,uvScale,
 
-            4.0,0.0,
-            3.0,-1.0,
+            4*uvScale,0.0,
+            3*uvScale,-uvScale,
 
-            2.0,-1.0
+            2*uvScale,-uvScale
     };
 }
 
 
 
-void Object::subdivideSphere(float radius, vector<int> &seam) {
+void Object::subdivideSphere(float radius) {
     int numTriangles = indices.size();
 
     vector<float> subbedVertices;
     vector<int> subbedIndices;
-    vector<int> subbedSeam;
 
     int indexs;
-
-    cout << "v1, v2, v3: "<<endl;
-
+    int seams = 0;
     for(int i = 1; i < 2; ++i){
         indexs = 0;
         for(int j = 0; j < numTriangles; j += 3){
@@ -253,14 +278,6 @@ void Object::subdivideSphere(float radius, vector<int> &seam) {
             glm::vec3 midVec12 = findMidpoint(v1,v2, radius);
             glm::vec3 midVec13 = findMidpoint(v1,v3, radius);
             glm::vec3 midVec23 = findMidpoint(v2,v3, radius);
-
-            if(v1 == seam.at(i) && v2 == seam.at(i)){
-                
-            }else if(v1 == seam.at(i) && v3 == seam.at(i)){
-
-            }else if(v2 == seam.at(i) && v3 == seam.at(i)){
-
-            }
 
             addVerts(subbedVertices, {vertices.at(v1*3),vertices.at(v1*3 + 1), vertices.at(v1*3 + 2)});
 
@@ -293,7 +310,6 @@ void Object::subdivideSphere(float radius, vector<int> &seam) {
         }
         vertices = subbedVertices;
         indices = subbedIndices;
-        cout << "indices length: " << indices.size() << endl;
     }
 }
 
@@ -324,16 +340,24 @@ void Object::addIndices(vector<int> &vector, glm::vec3 info) {
 
 }
 
+void Object::calculateNormals() {
+    int i;
+    for(i = 0; i < indices.size(); ++i){
+
+    }
+}
+
 //Public//////////
 /* Object Constructor
  * Holds info about: position, scale, velocity, color, if its dynamic / static, and the screen size
  */
-Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, bool dynamic, int scWidth, int scHeight){
+Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, float uvScale, bool dynamic, int scWidth, int scHeight){
     this->position = position;
     this->scale = scale;
     this->velocity = velocity;
     this->mass = mass;
     this->color = color;
+    this->uvScale = uvScale;
     this->dynamic = dynamic;
     this->scWidth = scWidth;
     this->scHeight = scHeight;

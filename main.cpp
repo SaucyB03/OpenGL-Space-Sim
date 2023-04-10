@@ -84,7 +84,7 @@ int main(){
     Shader* shader = new Shader("../vertexShader.glsl", "../fragmentShader.glsl");
     Camera camera = *new Camera({0.0,0.0,3.0}, {0.0,0.0,-1.0},{0.0,1.0,0.0});
 
-    Object plane = *new Object(glm::vec3(1.0, 1.0,-3.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, true, SC_WIDTH, SC_HEIGHT);
+    Object plane = *new Object(glm::vec3(0.5, 0.5,-1.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, 1.0f, true, SC_WIDTH, SC_HEIGHT);
     //Object plane2 = *new Object(glm::vec3(-0.5, 0.0,-3.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), glm::vec3(1.0f, 0.5f, 0.2f), false, SC_WIDTH, SC_HEIGHT);
 
     glm::mat4 projection = glm::mat4(1.0f);
