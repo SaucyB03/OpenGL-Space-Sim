@@ -20,6 +20,8 @@ enum Shape{
 
 class Object {
 private:
+    const int SPHERE_SUB = 3;
+
     int scWidth;
     int scHeight;
 
@@ -30,7 +32,7 @@ private:
     glm::vec3 velocity;
     float mass;
     glm::vec3 color;
-    float angle = 0.0f;
+    glm::vec3 angle = glm::vec3(0.0f);
     float uvScale;
 
 
@@ -93,7 +95,7 @@ public:
      * sets the velocity to the inputted vec2
      */
     void setVelocity(glm::vec3 newVelocity);
-    void setAngle(float add);
+    void setAngle(glm::vec3 add);
 };
 
 

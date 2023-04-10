@@ -30,8 +30,8 @@ void Object::assignBuffandArr(){
     }else {
         glBindBuffer(GL_ARRAY_BUFFER, this->vb);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + textCords.size() * sizeof(float), 0, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices);
-        glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), textCords.size() * sizeof(float), &textCords);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices.front());
+        glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), textCords.size() * sizeof(float), &textCords.front());
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eb);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), &indices.front(), GL_STATIC_DRAW);
@@ -57,7 +57,7 @@ void Object::assignBuffandArr(){
 
     // texture 1
     // ---------
-    string filename = "../textures/UVMap.jpg";
+    string filename = "../textures/Alien_Muscle_001_COLOR.jpg";
 
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -239,7 +239,7 @@ void Object::subdivideSphere(float radius) {
     vector<float> subbedTextCord;
 
     int indexs;
-    for(int i = 1; i < 4; ++i){
+    for(int i = 1; i < SPHERE_SUB; ++i){
         indexs = 0;
         numTriangles = indices.size();
         for(int j = 0; j < numTriangles; j += 3){
@@ -416,7 +416,9 @@ void Object::display(Shader* shader) {
 
     model = glm::translate(model, position);
     //model = glm::translate(model, {-scale.x/2, 0.0,-scale.z/2});
-    model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(angle.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(angle.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(angle.z), glm::vec3(0.0f, 0.0f, 1.0f));
     //model = glm::translate(model, {scale.x/2, 0.0,scale.z/2});
 
     shader->setInt("texture1", 0);
@@ -457,6 +459,9 @@ void Object::setVelocity(glm::vec3 newVelocity) {
     this->velocity = newVelocity;
 }
 
-void Object::setAngle(float add) {
-    this->angle += add;
+void Object::setAngle(glm::vec3 add) {
+    this->angle.x += add.x;
+    this->angle.y += add.y;
+    this->angle.z += add.z;
+
 }
