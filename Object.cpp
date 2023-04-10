@@ -153,36 +153,8 @@ void Object::generateSphere() {
         }
     }
 
-    cout << "pre sub vertices size("<< vertices.size() << ") : {" << endl;
-    for(i = 0; i < vertices.size(); ++i){
-        cout << vertices.at(i) << ", ";
-        if((i+1) % 3 == 0){
-            cout << endl;
-        }
-    }
-    cout << "}\npre sub texCords: {"<<endl;
-    for(i = 0; i < textCords.size(); ++i){
-        cout << textCords.at(i) << ", ";
-        if((i+1) % 2 == 0){
-            cout << endl;
-        }
-    }
-    cout << "indices length: " << indices.size() << endl;
-    //subdivideSphere(radius);
-    cout << "}\npost sub indices: {"<<endl;
-    for(i = 0; i < indices.size(); ++i){
-        cout << indices.at(i) << ", ";
-        if((i+1) % 3 == 0){
-            cout << endl;
-        }
-    }
-    cout << "}\npost sub texCords: {"<<endl;
-    for(i = 0; i < textCords.size(); ++i){
-        cout << textCords.at(i) << ", ";
-        if((i+1) % 2 == 0){
-            cout << endl;
-        }
-    }
+    subdivideSphere(radius);
+
     //calculateTexCordsAndNormals(seam);
 }
 
@@ -260,24 +232,25 @@ void Object::generateCube() {
 
 
 void Object::subdivideSphere(float radius) {
-    int numTriangles = indices.size();
+    int numTriangles;
 
     vector<float> subbedVertices;
     vector<int> subbedIndices;
+    vector<float> subbedTextCord;
 
     int indexs;
-    int seams = 0;
-    for(int i = 1; i < 2; ++i){
+    for(int i = 1; i < 4; ++i){
         indexs = 0;
+        numTriangles = indices.size();
         for(int j = 0; j < numTriangles; j += 3){
             int v1 = indices.at(j);
             int v2 = indices.at(j+1);
             int v3 = indices.at(j+2);
 
 
-            glm::vec3 midVec12 = findMidpoint(v1,v2, radius);
-            glm::vec3 midVec13 = findMidpoint(v1,v3, radius);
-            glm::vec3 midVec23 = findMidpoint(v2,v3, radius);
+            glm::vec3 midVec12 = findMidpoint(v1,v2, radius, "vertices");
+            glm::vec3 midVec13 = findMidpoint(v1,v3, radius, "vertices");
+            glm::vec3 midVec23 = findMidpoint(v2,v3, radius, "vertices");
 
             addVerts(subbedVertices, {vertices.at(v1*3),vertices.at(v1*3 + 1), vertices.at(v1*3 + 2)});
 
@@ -291,6 +264,23 @@ void Object::subdivideSphere(float radius) {
 
             addVerts(subbedVertices, midVec23);
 
+            glm::vec3 midTex12 = findMidpoint(v1,v2, radius, "textCords");
+            glm::vec3 midTex13 = findMidpoint(v1,v3, radius, "textCords");
+            glm::vec3 midTex23 = findMidpoint(v2,v3, radius, "textCords");
+
+            subbedTextCord.push_back(textCords.at(v1*2));
+            subbedTextCord.push_back(textCords.at(v1*2 + 1));
+            subbedTextCord.push_back(midTex12.x);
+            subbedTextCord.push_back(midTex12.y);
+            subbedTextCord.push_back(textCords.at(v2*2));
+            subbedTextCord.push_back(textCords.at(v2*2 + 1));
+            subbedTextCord.push_back(midTex13.x);
+            subbedTextCord.push_back(midTex13.y);
+            subbedTextCord.push_back(textCords.at(v3*2));
+            subbedTextCord.push_back(textCords.at(v3*2 + 1));
+            subbedTextCord.push_back(midTex23.x);
+            subbedTextCord.push_back(midTex23.y);
+
             // compute 3 new vertices by spliting half on each edge
             //         v1
             //        / \
@@ -300,27 +290,44 @@ void Object::subdivideSphere(float radius) {
             //       newV2
 
 
-            addIndices(subbedIndices, {indexs+1,indexs, indexs+3});
-            addIndices(subbedIndices, {indexs+2,indexs+1, indexs+5});
-            addIndices(subbedIndices, {indexs+3,indexs+4, indexs+5});
-            addIndices(subbedIndices, {indexs+1,indexs+3, indexs+5});
+            addIndices(subbedIndices, {indexs,indexs+1, indexs+3});
+            addIndices(subbedIndices, {indexs+1,indexs+2, indexs+5});
+            addIndices(subbedIndices, {indexs+4,indexs+3, indexs+5});
+            addIndices(subbedIndices, {indexs+3,indexs+1, indexs+5});
 
             indexs += 6;
 
         }
         vertices = subbedVertices;
         indices = subbedIndices;
+        textCords = subbedTextCord;
+        subbedVertices.clear();
+        subbedIndices.clear();
+        subbedTextCord.clear();
     }
 }
 
-glm::vec3 Object::findMidpoint(int vertex1, int vertex2, float radius) {
-    glm::vec3 vertex1Cords = {vertices.at(vertex1*3), vertices.at(vertex1*3 + 1), vertices.at(vertex1*3 + 2)};
-    glm::vec3 vertex2Cords = {vertices.at(vertex2*3), vertices.at(vertex2*3 + 1), vertices.at(vertex2*3 + 2)};
+glm::vec3 Object::findMidpoint(int vertex1, int vertex2, float radius, string type) {
 
-    glm::vec3 midpoint = {(vertex1Cords.x + vertex2Cords.x)/2, (vertex1Cords.y + vertex2Cords.y)/2, (vertex1Cords.z + vertex2Cords.z)/2};
+    glm::vec3 p1Cords = glm::vec3(0.0f);
+    glm::vec3 p2Cords = glm::vec3(0.0f);
+    glm::vec3 midpoint = glm::vec3(0.0f);
 
-    float scaling = radius / sqrt(midpoint.x*midpoint.x + midpoint.y*midpoint.y + midpoint.z*midpoint.z);
-    midpoint *= scaling;
+    if(type == "vertices") {
+        p1Cords = {vertices.at(vertex1 * 3), vertices.at(vertex1 * 3 + 1), vertices.at(vertex1 * 3 + 2)};
+        p2Cords = {vertices.at(vertex2 * 3), vertices.at(vertex2 * 3 + 1), vertices.at(vertex2 * 3 + 2)};
+
+        midpoint = {(p1Cords.x + p2Cords.x) / 2, (p1Cords.y + p2Cords.y) / 2,
+                              (p1Cords.z + p2Cords.z) / 2};
+
+        float scaling = radius / sqrt(midpoint.x * midpoint.x + midpoint.y * midpoint.y + midpoint.z * midpoint.z);
+        midpoint *= scaling;
+    }else if(type == "textCords"){
+        p1Cords = {textCords.at(vertex1 * 2), textCords.at(vertex1 * 2 + 1), 0};
+        p2Cords = {textCords.at(vertex2 * 2), textCords.at(vertex2 * 2 + 1), 0};
+
+        midpoint = {(p1Cords.x + p2Cords.x) / 2, (p1Cords.y + p2Cords.y) / 2,0};
+    }
 
     return midpoint;
 }

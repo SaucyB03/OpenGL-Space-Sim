@@ -54,7 +54,7 @@ private:
 
 
     void subdivideSphere(float radius);
-    glm::vec3 findMidpoint(int vertex1, int vertex2, float radius);
+    glm::vec3 findMidpoint(int vertex1, int vertex2, float radius, string type);
     void calculateNormals();
 
     void addVerts(vector<float> &vector, glm::vec3 info);

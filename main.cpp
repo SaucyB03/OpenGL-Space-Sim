@@ -47,6 +47,7 @@ void checkInput(GLFWwindow *window, Object &object, float deltaTime){
     }else if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
         object.setAngle(-0.1);
     }
+
 }
 
 
