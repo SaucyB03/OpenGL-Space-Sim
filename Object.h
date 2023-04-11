@@ -21,6 +21,7 @@ enum Shape{
 class Object {
 private:
     const int SPHERE_SUB = 3;
+    const float UNIVERSAL_GRAVITY_CONSTANT = 6.673 * pow(10, -1);
 
     int scWidth;
     int scHeight;
@@ -36,6 +37,7 @@ private:
     glm::vec3 angle = glm::vec3(0.0f);
     float uvScale;
 
+    string textureFilename;
 
     vector<float> vertices;
     vector<int> indices;
@@ -66,7 +68,7 @@ public:
     /* Object Constructor
      * Holds info about: position, scale, velocity, color, if its dynamic / static, and the screen size
      */
-    Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, float uvScale, bool dynamic, int scWidth, int scHeight);
+    Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, string textureFilename, float uvScale, bool dynamic, int scWidth, int scHeight);
     //Destructor: deletes the created buffers
     ~Object();
 
@@ -79,7 +81,7 @@ public:
      */
     void display(Shader* shader);
 
-    void addForce(glm::vec3 force);
+    void addForce(glm::vec3 otherObjPos, float otherObjMass);
 
     /*getPostion
      * returns the objects position as a vec2
@@ -94,11 +96,14 @@ public:
      */
     glm::vec3 getScale();
 
+    float getMass();
+
     /* setVelocity
      * sets the velocity to the inputted vec2
      */
     void setVelocity(glm::vec3 newVelocity);
     void setAngle(glm::vec3 add);
+    void setForce(glm::vec3 force);
 };
 
 

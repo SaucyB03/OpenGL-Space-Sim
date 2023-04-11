@@ -62,8 +62,6 @@ void Object::assignBuffandArr(){
 
     // texture 1
     // ---------
-    string filename = "../textures/Alien_Muscle_001_COLOR.jpg";
-
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
     // set the texture wrapping parameters`
@@ -75,7 +73,7 @@ void Object::assignBuffandArr(){
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(textureFilename.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -377,12 +375,13 @@ void Object::calculateNormals() {
 /* Object Constructor
  * Holds info about: position, scale, velocity, color, if its dynamic / static, and the screen size
  */
-Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, float uvScale, bool dynamic, int scWidth, int scHeight){
+Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, string textureFilename, float uvScale, bool dynamic, int scWidth, int scHeight){
     this->position = position;
     this->scale = scale;
     this->velocity = velocity;
     this->mass = mass;
     this->color = color;
+    this->textureFilename = textureFilename;
     this->uvScale = uvScale;
     this->dynamic = dynamic;
     this->scWidth = scWidth;
@@ -409,6 +408,12 @@ Object::~Object() {
  * if there's a velocity on the object then it updates it from the last frame
  */
 void Object::move(float deltaTime) {
+    if(currentForce.x != 0 || currentForce.y != 0 || currentForce.z != 0){
+        velocity.x += (currentForce.x / mass) * deltaTime;
+        velocity.y += (currentForce.y / mass) * deltaTime;
+        velocity.z += (currentForce.z / mass) * deltaTime;
+
+    }
     if(dynamic) {
         if (velocity.x != 0) {
             position.x += velocity.x * deltaTime;
@@ -442,13 +447,23 @@ void Object::display(Shader* shader) {
 
     shader->setInt("texture1", 0);
     shader->setUniformMat4("model", model);
-    shader->setVec3("color", color);
 
     //Displaying object
     glBindVertexArray(this->va); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
     glDrawElements(GL_TRIANGLES, indices.size() * sizeof(int), GL_UNSIGNED_INT, 0);
 
 }
+
+void Object::addForce(glm::vec3 otherObjPos, float otherObjMass) {
+    float dist = 10 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
+
+    float totalForce = UNIVERSAL_GRAVITY_CONSTANT * mass * otherObjMass / (dist*dist);
+
+    //float frceDistRtio = totalForce / dist;
+
+    currentForce += glm::vec3(totalForce * (otherObjPos.x - position.x), totalForce * (otherObjPos.y - position.y), totalForce * (otherObjPos.z - position.z));
+}
+
 
 /*getPostion
  * returns the objects position as a vec3
@@ -471,6 +486,10 @@ glm::vec3 Object::getScale() {
     return scale;
 }
 
+float Object::getMass() {
+    return mass;
+}
+
 /* setVelocity
  * sets the velocity to the inputted vec2
  */
@@ -483,4 +502,8 @@ void Object::setAngle(glm::vec3 add) {
     this->angle.y += add.y;
     this->angle.z += add.z;
 
+}
+
+void Object::setForce(glm::vec3 force){
+    currentForce = force;
 }

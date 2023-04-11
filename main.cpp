@@ -12,7 +12,7 @@
 using namespace std;
 
 
-const int SC_WIDTH = 1600;
+const int SC_WIDTH = 3200;
 const int SC_HEIGHT = 1600;
 
 Camera* camera;
@@ -82,13 +82,20 @@ int main(){
 
 
 
-    Shader* shader = new Shader("../vertexLightSourceShader.glsl", "../fragmentLightSourceShader.glsl");
+    Shader* lightSourceshader = new Shader("../vertexLightSourceShader.glsl", "../fragmentLightSourceShader.glsl");
+    Shader* shader = new Shader("../vertexShader.glsl", "../fragmentShader.glsl");
     camera = new Camera({0.0,0.0,3.0}, {0.0,0.0,-1.0},{0.0,1.0,0.0});
 
-    vector<Object*> planets;
-    planets.push_back(new Object(glm::vec3(0.5, 0.5,-1.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, 1.0f, true, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(-0.5, 0.5,-3.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 10.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    //Texture Files:
+    string sunTex = "../textures/ExaggeratedSunTexture.jpg";
+    string planetTex = "../textures/Moss_Dirt_Planet.jpg";
+    string uvTex = "../textures/UVMap.jpg";
 
+    vector<Object*> planets;
+    planets.push_back(new Object(glm::vec3(0.5, 0.5,-1.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 1000.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, sunTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(-0.5, 0.5,-3.0), glm::vec3(0.5,0.5,0.5), glm::vec3(2.0,0.0,0.0), 50.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+
+    Object ground = *new Object(glm::vec3(-2,-1.0,2.0), glm::vec3(10,1,10), glm::vec3(0.0,0.0,0.0), 0.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, uvTex, 1.0f, false, SC_WIDTH, SC_HEIGHT);
     glfwSetCursorPosCallback(window, mouseCallback);
 
     glm::mat4 projection = glm::mat4(1.0f);
@@ -101,33 +108,44 @@ int main(){
 
         startTime = std::chrono::high_resolution_clock::now();
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         checkInput(window, deltaTime);
-
-        shader->bindShader();
-
         projection = glm::perspective(glm::radians(45.0f), (float) SC_WIDTH / (float) SC_HEIGHT, 0.1f, 100.0f);
 
+        int i,j;
+//        for(i = 0; i < planets.size(); ++i){
+//            planets.at(i)->setForce({0.0,0.0,0.0});
+//            for(j = 0; j < planets.size(); ++j){
+//                if(j != i){
+//                    planets.at(i)->addForce(planets.at(j)->getPosition(), planets.at(j)->getMass());
+//                }
+//            }
+//        }
+        planets.at(0)->setForce({0.0,0.0,0.0});
+        planets.at(1)->setForce({0.0,0.0,0.0});
 
+        planets.at(0)->addForce(planets.at(1)->getPosition(), planets.at(1)->getMass());
+        planets.at(1)->addForce(planets.at(0)->getPosition(), planets.at(0)->getMass());
+
+        for(i = 0; i < planets.size(); ++i){
+            planets.at(i)->move(deltaTime);
+        }
+
+        lightSourceshader->bindShader();
+
+        lightSourceshader->setUniformMat4("projection", projection);
+        camera->applyView(lightSourceshader);
+        planets.at(0)->display(lightSourceshader);
+
+        shader->bindShader();
         shader->setUniformMat4("projection", projection);
         shader->setVec3("lightPos", planets.at(0)->getPosition());
         camera->applyView(shader);
 
-        //plane.move(deltaTime);
-
-//        int i,j;
-//        for(i = 0; i < planets.size(); ++i){
-//            for(j = 0; j < planets.size(); ++j){
-//                if(j != i){
-//                    planets.at(i)
-//                }
-//            }
-//        }
-
-        planets.at(0)->display(shader);
         planets.at(1)->display(shader);
+        ground.display(shader);
 
         //refresh the window
         glfwSwapBuffers(window);
