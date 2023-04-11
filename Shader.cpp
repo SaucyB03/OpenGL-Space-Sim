@@ -128,4 +128,3 @@ void Shader::setInt(const char *variableName, int integer){
 }
 
 
-

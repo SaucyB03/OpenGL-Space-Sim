@@ -106,12 +106,12 @@ void Object::generateSphere() {
             addVerts(vertices, {x, y, z});
             addVerts(vertices, {0.0, scale.y / 2, 0.0});
 
-            textCords.push_back(tx * uvScale);
-            textCords.push_back(ty * uvScale);
-            textCords.push_back((tx + uvScale/2) * uvScale);
-            textCords.push_back((ty - uvScale) * uvScale);
+            textCords.push_back(tx * uvScale.x);
+            textCords.push_back(ty * uvScale.y);
+            textCords.push_back((tx + uvScale.x/2) * uvScale.x);
+            textCords.push_back((ty - uvScale.y) * uvScale.y);
 
-            tx += uvScale;
+            tx += uvScale.x;
 
             index += 2;
         } else if (i > 6 && i < 12) {
@@ -124,12 +124,12 @@ void Object::generateSphere() {
             addVerts(vertices, {x, y, z});
             addVerts(vertices, {0.0, -scale.y / 2, 0.0});
 
-            textCords.push_back(tx * uvScale);
-            textCords.push_back(ty * uvScale);
-            textCords.push_back((tx + uvScale/2) * uvScale);
-            textCords.push_back((ty + uvScale) * uvScale);
+            textCords.push_back(tx * uvScale.x);
+            textCords.push_back(ty * uvScale.y);
+            textCords.push_back((tx + uvScale.x/2) * uvScale.x);
+            textCords.push_back((ty + uvScale.y) * uvScale.y);
 
-            tx += uvScale;
+            tx += uvScale.x;
 
             index += 2;
         } else if(i == 12){
@@ -138,19 +138,19 @@ void Object::generateSphere() {
             z = radius * cos(-phi) * sin(theta);
 
             addVerts(vertices, {x, y, z});
-            textCords.push_back(tx * uvScale);
-            textCords.push_back(ty * uvScale);
+            textCords.push_back(tx * uvScale.x);
+            textCords.push_back(ty * uvScale.y);
         }else{
             x = radius * cos(phi) * cos(theta);
             y = radius * sin(phi);
             z = radius * cos(phi) * sin(theta);
 
             addVerts(vertices, {x, y, z});
-            textCords.push_back(tx * uvScale);
-            textCords.push_back(ty * uvScale);
+            textCords.push_back(tx * uvScale.x);
+            textCords.push_back(ty * uvScale.y);
 
-            tx = uvScale;
-            ty += uvScale;
+            tx = uvScale.x;
+            ty += uvScale.y;
 
             LRot = M_PI/5;
             index += 2;
@@ -211,25 +211,25 @@ void Object::generateCube() {
     };
 
     textCords = {
-            uvScale,uvScale,
-            0.0,uvScale,
+            uvScale.x,uvScale.y,
+            0.0,uvScale.y,
             0.0,0.0,
-            uvScale,0.0,
+            uvScale.x,0.0,
 
-            2*uvScale,uvScale,
-            3*uvScale,uvScale,
-            3*uvScale,0.0,
-            2*uvScale,0.0,
+            2*uvScale.x,uvScale.y,
+            3*uvScale.x,uvScale.y,
+            3*uvScale.x,0.0,
+            2*uvScale.x,0.0,
 
-            2*uvScale,2*uvScale,
+            2*uvScale.x,2*uvScale.y,
 
-            3*uvScale,2*uvScale,
-            4*uvScale,uvScale,
+            3*uvScale.x,2*uvScale.y,
+            4*uvScale.x,uvScale.y,
 
-            4*uvScale,0.0,
-            3*uvScale,-uvScale,
+            4*uvScale.x,0.0,
+            3*uvScale.x,-uvScale.y,
 
-            2*uvScale,-uvScale
+            2*uvScale.x,-uvScale.y
     };
 
     calculateNormals();
@@ -376,7 +376,7 @@ void Object::calculateNormals() {
 /* Object Constructor
  * Holds info about: position, scale, velocity, color, if its dynamic / static, and the screen size
  */
-Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, string textureFilename, float uvScale, bool dynamic, int scWidth, int scHeight){
+Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, string textureFilename, glm::vec2 uvScale, bool dynamic, int scWidth, int scHeight){
     this->position = position;
     this->scale = scale;
     this->velocity = velocity;

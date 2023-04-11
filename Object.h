@@ -35,7 +35,7 @@ private:
     glm::vec3 currentForce = glm::vec3(0.0f);
     glm::vec3 color;
     glm::vec3 angle = glm::vec3(0.0f);
-    float uvScale;
+    glm::vec2 uvScale;
 
     string textureFilename;
 
@@ -68,7 +68,7 @@ public:
     /* Object Constructor
      * Holds info about: position, scale, velocity, color, if its dynamic / static, and the screen size
      */
-    Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, string textureFilename, float uvScale, bool dynamic, int scWidth, int scHeight);
+    Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, string textureFilename, glm::vec2 uvScale, bool dynamic, int scWidth, int scHeight);
     //Destructor: deletes the created buffers
     ~Object();
 
