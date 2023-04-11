@@ -16,19 +16,15 @@ Camera::~Camera() {
 void Camera::applyView(Shader* shader) {
     view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     shader->setUniformMat4("view", view);
+    shader->setVec3("viewPos", cameraPos);
 }
 
 void Camera::move(glm::vec3 move, float deltaTime) {
-    //float xyHyp = sqrt(move.x * move.x + move.y * move.y);
-
-//    cameraPos.x += (cameraPos.x * cos(glm::radians(angles.x)) - move.z * sin(glm::radians(angles.x)))  * speed * deltaTime;
-//    cameraPos.z += (move.x * sin(glm::radians(angles.x)) + move.z * cos(glm::radians(angles.x))) * speed * deltaTime;
 
     cameraPos.x +=  (move.z * cos(glm::radians(angles.x)) - move.x * sin(glm::radians(angles.x))) * speed * deltaTime;
     cameraPos.z +=  (move.z * sin(glm::radians(angles.x)) + move.x * cos(glm::radians(angles.x))) * speed * deltaTime;
 
     cameraPos.y += move.y * speed * deltaTime;
-    //cameraPos += move  * speed * deltaTime;
 }
 
 void Camera::lookAround() {

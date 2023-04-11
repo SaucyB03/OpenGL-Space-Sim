@@ -10,7 +10,7 @@ private:
     glm::vec3 cameraUp;
     glm::mat4 view;
     glm::vec3 angles = {-90,0.0,0.0};
-    float speed = 2.5;
+    float speed = 5.0;
 
     bool firstMouse = true;
     float lastX = 0.0, lastY = 0.0;

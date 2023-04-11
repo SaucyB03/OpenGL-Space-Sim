@@ -90,14 +90,17 @@ int main(){
     string sunTex = "../textures/ExaggeratedSunTexture.jpg";
     string planetTex = "../textures/Moss_Dirt_Planet.jpg";
     string uvTex = "../textures/UVMap.jpg";
+    string earthTex = "../textures/Ground047_4K_Displacement.jpg"; // must set objects uvScale to 0.25 for texture to appear correct
 
     vector<Object*> planets;
-    planets.push_back(new Object(glm::vec3(0.0, 5,0.0), glm::vec3(2.0,2.0,2.0), glm::vec3(0.0,0.0,0.0), 100000000000000.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, sunTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(0.0, 5,-10.0), glm::vec3(0.5,0.5,0.5), glm::vec3(40.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(0.0, 5,10.0), glm::vec3(0.5,0.5,0.5), glm::vec3(40.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(0.0, 5,5.0), glm::vec3(0.5,0.5,0.5), glm::vec3(30.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(2.0,2.0,2.0), glm::vec3(0.0,0.0,0.0), 100000000000.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, earthTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(0.0, 3,-10.0), glm::vec3(0.5,0.5,0.5), glm::vec3(1.0,0.0,0.0), 1000000.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(0.0, 8,10.0), glm::vec3(0.5,0.5,0.5), glm::vec3(-1.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(0.0, 3,5.0), glm::vec3(0.5,0.5,0.5), glm::vec3(1.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(2.0, 4,5.0), glm::vec3(0.5,0.5,0.5), glm::vec3(1.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
 
-    Object ground = *new Object(glm::vec3(-2,0.0,2.0), glm::vec3(10,1,10), glm::vec3(0.0,0.0,0.0), 0.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, uvTex, 1.0f, false, SC_WIDTH, SC_HEIGHT);
+
+    Object ground = *new Object(glm::vec3(-2,-1.0,2.0), glm::vec3(50,0.25,50), glm::vec3(0.0,0.0,0.0), 0.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, uvTex, 5.0f, false, SC_WIDTH, SC_HEIGHT);
     glfwSetCursorPosCallback(window, mouseCallback);
 
     glm::mat4 projection = glm::mat4(1.0f);

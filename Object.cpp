@@ -68,7 +68,7 @@ void Object::assignBuffandArr(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
@@ -76,12 +76,13 @@ void Object::assignBuffandArr(){
     unsigned char *data = stbi_load(textureFilename.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
+
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "ERROR: Failed to load texture of filename: '" << textureFilename << "'" << std::endl;
     }
     stbi_image_free(data);
 }
@@ -107,10 +108,10 @@ void Object::generateSphere() {
 
             textCords.push_back(tx * uvScale);
             textCords.push_back(ty * uvScale);
-            textCords.push_back((tx + 0.5f) * uvScale);
-            textCords.push_back((ty - 1.0f) * uvScale);
+            textCords.push_back((tx + uvScale/2) * uvScale);
+            textCords.push_back((ty - uvScale) * uvScale);
 
-            tx ++;
+            tx += uvScale;
 
             index += 2;
         } else if (i > 6 && i < 12) {
@@ -125,10 +126,10 @@ void Object::generateSphere() {
 
             textCords.push_back(tx * uvScale);
             textCords.push_back(ty * uvScale);
-            textCords.push_back((tx + 0.5f) * uvScale);
-            textCords.push_back((ty + 1.0f) * uvScale);
+            textCords.push_back((tx + uvScale/2) * uvScale);
+            textCords.push_back((ty + uvScale) * uvScale);
 
-            tx ++;
+            tx += uvScale;
 
             index += 2;
         } else if(i == 12){
@@ -148,8 +149,8 @@ void Object::generateSphere() {
             textCords.push_back(tx * uvScale);
             textCords.push_back(ty * uvScale);
 
-            tx = 1.0;
-            ty = 1.0;
+            tx = uvScale;
+            ty += uvScale;
 
             LRot = M_PI/5;
             index += 2;
