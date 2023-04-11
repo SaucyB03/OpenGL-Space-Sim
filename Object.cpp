@@ -459,7 +459,6 @@ void Object::addForce(glm::vec3 otherObjPos, float otherObjMass) {
 
     float totalForce = UNIVERSAL_GRAVITY_CONSTANT * mass * otherObjMass / (dist*dist);
 
-    //float frceDistRtio = totalForce / dist;
 
     currentForce += glm::vec3(totalForce * (otherObjPos.x - position.x), totalForce * (otherObjPos.y - position.y), totalForce * (otherObjPos.z - position.z));
 }

@@ -92,10 +92,12 @@ int main(){
     string uvTex = "../textures/UVMap.jpg";
 
     vector<Object*> planets;
-    planets.push_back(new Object(glm::vec3(0.5, 0.5,-1.0), glm::vec3(0.5,0.5,0.5), glm::vec3(0.0,0.0,0.0), 1000.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, sunTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(-0.5, 0.5,-3.0), glm::vec3(0.5,0.5,0.5), glm::vec3(2.0,0.0,0.0), 50.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(0.0, 5,0.0), glm::vec3(2.0,2.0,2.0), glm::vec3(0.0,0.0,0.0), 100000000000000.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, sunTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(0.0, 5,-10.0), glm::vec3(0.5,0.5,0.5), glm::vec3(40.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(0.0, 5,10.0), glm::vec3(0.5,0.5,0.5), glm::vec3(40.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(0.0, 5,5.0), glm::vec3(0.5,0.5,0.5), glm::vec3(30.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
 
-    Object ground = *new Object(glm::vec3(-2,-1.0,2.0), glm::vec3(10,1,10), glm::vec3(0.0,0.0,0.0), 0.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, uvTex, 1.0f, false, SC_WIDTH, SC_HEIGHT);
+    Object ground = *new Object(glm::vec3(-2,0.0,2.0), glm::vec3(10,1,10), glm::vec3(0.0,0.0,0.0), 0.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, uvTex, 1.0f, false, SC_WIDTH, SC_HEIGHT);
     glfwSetCursorPosCallback(window, mouseCallback);
 
     glm::mat4 projection = glm::mat4(1.0f);
@@ -115,19 +117,19 @@ int main(){
         projection = glm::perspective(glm::radians(45.0f), (float) SC_WIDTH / (float) SC_HEIGHT, 0.1f, 100.0f);
 
         int i,j;
-//        for(i = 0; i < planets.size(); ++i){
-//            planets.at(i)->setForce({0.0,0.0,0.0});
-//            for(j = 0; j < planets.size(); ++j){
-//                if(j != i){
-//                    planets.at(i)->addForce(planets.at(j)->getPosition(), planets.at(j)->getMass());
-//                }
-//            }
-//        }
-        planets.at(0)->setForce({0.0,0.0,0.0});
-        planets.at(1)->setForce({0.0,0.0,0.0});
-
-        planets.at(0)->addForce(planets.at(1)->getPosition(), planets.at(1)->getMass());
-        planets.at(1)->addForce(planets.at(0)->getPosition(), planets.at(0)->getMass());
+        for(i = 0; i < planets.size(); ++i){
+            planets.at(i)->setForce({0.0,0.0,0.0});
+            for(j = 0; j < planets.size(); ++j){
+                if(j != i){
+                    planets.at(i)->addForce(planets.at(j)->getPosition(), planets.at(j)->getMass());
+                }
+            }
+        }
+//        planets.at(0)->setForce({0.0,0.0,0.0});
+//        planets.at(1)->setForce({0.0,0.0,0.0});
+//
+//        planets.at(0)->addForce(planets.at(1)->getPosition(), planets.at(1)->getMass());
+//        planets.at(1)->addForce(planets.at(0)->getPosition(), planets.at(0)->getMass());
 
         for(i = 0; i < planets.size(); ++i){
             planets.at(i)->move(deltaTime);
@@ -144,7 +146,9 @@ int main(){
         shader->setVec3("lightPos", planets.at(0)->getPosition());
         camera->applyView(shader);
 
-        planets.at(1)->display(shader);
+        for(i = 1; i < planets.size(); ++i){
+            planets.at(i)->display(shader);
+        }
         ground.display(shader);
 
         //refresh the window

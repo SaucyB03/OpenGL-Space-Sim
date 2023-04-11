@@ -21,7 +21,7 @@ enum Shape{
 class Object {
 private:
     const int SPHERE_SUB = 3;
-    const float UNIVERSAL_GRAVITY_CONSTANT = 6.673 * pow(10, -1);
+    const float UNIVERSAL_GRAVITY_CONSTANT = 6.673 * pow(10, -11);
 
     int scWidth;
     int scHeight;
