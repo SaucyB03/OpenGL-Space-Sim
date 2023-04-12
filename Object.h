@@ -6,7 +6,9 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
+
 #include "stb-master/stb_image.h"
+
 #include <vector>
 
 #include "Shader.h"
@@ -45,6 +47,7 @@ private:
     vector<float> normals;
 
     bool dynamic;
+    bool cubemap;
     //Add necessary buffers
     unsigned int va, vb, eb;
 
@@ -70,7 +73,7 @@ public:
      */
     Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 spin, Shape shape, string textureFilename, glm::vec2 uvScale, bool dynamic, int scWidth, int scHeight);
     //Non-Dynamic/Non-interactive:
-    Object(glm::vec3 position, glm::vec3 scale, Shape shape, string textureFilename, glm::vec2 uvScale, int scWidth, int scHeight);
+    Object(glm::vec3 position, glm::vec3 scale, Shape shape, string textureFilename, glm::vec2 uvScale, bool cubemap, int scWidth, int scHeight);
     //Destructor: deletes the created buffers
     ~Object();
 

@@ -96,7 +96,10 @@ int main(){
     string sunTex = "../textures/ExaggeratedSunTexture.jpg";
     string planetTex = "../textures/Moss_Dirt_Planet.jpg";
     string uvTex = "../textures/UVMap.jpg";
+    string cubeMap = "../textures/cubemap.png";
     string earthTex = "../textures/EarthIcoTexture.png"; // must set objects uvScale to (0.181818,0.333333) for texture to appear correct...   5.5 triangles wide, 3 triangles tall : (1/5.5, 1/3)
+
+
 
     vector<Object*> planets;
     planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
@@ -110,8 +113,10 @@ int main(){
 //    planets.push_back(new Object(glm::vec3(0.5, 3,12.0), glm::vec3(0.25,0.25,0.25), glm::vec3(1.0,0.0,0.0), 100.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
 
 
-    Object ground = *new Object(glm::vec3(-2,-5.0,2.0), glm::vec3(50,0.25,50), Shape::Cube, uvTex, glm::vec2(5.0f,5.0f), SC_WIDTH, SC_HEIGHT);
+    Object skybox = *new Object(glm::vec3(0,0.0,0.0), glm::vec3(500,500,500), Shape::Cube, cubeMap, glm::vec2(0.25f,0.3333333f), true, SC_WIDTH, SC_HEIGHT);
     glfwSetCursorPosCallback(window, mouseCallback);
+
+
 
     glm::mat4 projection = glm::mat4(1.0f);
     auto startTime = std::chrono::high_resolution_clock::now();
@@ -157,7 +162,7 @@ int main(){
         for(i = 1; i < planets.size(); ++i){
             planets.at(i)->display(shader);
         }
-        ground.display(shader);
+        skybox.display(shader);
 
         //refresh the window
         glfwSwapBuffers(window);

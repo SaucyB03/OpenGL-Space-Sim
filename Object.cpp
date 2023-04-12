@@ -56,7 +56,7 @@ void Object::assignBuffandArr(){
     glBindVertexArray(0);
 
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
@@ -173,14 +173,6 @@ void Object::generateSphere() {
         }
     }
 
-    cout << "indices: " << endl;
-    for(i = 0; i < indices.size(); ++i){
-        cout << indices.at(i) << ", ";
-        if((i+1)% 3 == 0){
-            cout << endl;
-        }
-    }
-
     subdivideSphere(radius);
 
     calculateNormals();
@@ -195,7 +187,6 @@ void Object::generateCube() {
     // |/           |/
     //3*------------*0
 
-
     vertices = {
             scale.x/2,  -scale.y/2,    scale.z/2,  /* front bottom right */
             scale.x/2,  scale.y/2,    scale.z/2,  /* front top right */
@@ -208,15 +199,15 @@ void Object::generateCube() {
             -scale.x/2, -scale.y/2,  -scale.z/2,   /* front bottom left */
 
             //Splitting vertices for unwrapping onto texture
-            scale.x/2,  -scale.y/2,    scale.z/2,
+            scale.x/2,  scale.y/2,    -scale.z/2,// vert #5 | 8
 
-            scale.x/2,  scale.y/2,    scale.z/2,
-            scale.x/2,  scale.y/2,    scale.z/2,
+            scale.x/2,  scale.y/2,    scale.z/2, // vert #1 | 9
+            scale.x/2,  scale.y/2,    scale.z/2, // vert #1 | 10
 
-            -scale.x/2,  scale.y/2,    scale.z/2,
-            -scale.x/2,  scale.y/2,    scale.z/2,
+            -scale.x/2,  scale.y/2,    scale.z/2, // vert #2 | 11
+            -scale.x/2,  scale.y/2,    scale.z/2, // vert #2 | 12
 
-            -scale.x/2,  -scale.y/2,   scale.z/2
+            -scale.x/2,  scale.y/2,   -scale.z/2  //vert #6 | 13
 
     };
     indices = {
@@ -224,46 +215,53 @@ void Object::generateCube() {
             1, 3, 2,   // second Triangle
             4, 6, 7,
             6, 4, 5,
-            4, 9, 5,
-            9, 4, 8,
-            13, 6, 12,
-            6, 13, 7,
-            4, 3, 0,
-            3, 4, 7,
-            6, 10, 11,
-            10, 6, 5
+            7, 0, 4,
+            0, 7, 3,
+            6, 5, 9,
+            9, 11, 6,
+            4, 10, 8,
+            10, 4, 0,
+            13, 3, 7,
+            3, 13, 12
     };
 
+    /*             2[12]     6[13]
+     *             *---------*
+     *             |         |
+     *   2         |3        |7        6         2[11]
+     *   *---------*---------*---------*---------*
+     *   |         |         |         |         |
+     *   |         |         |         |         |
+     *   *---------*---------*---------*---------*
+     *   1         |0        |4        5         1[9]
+     *             |         |
+     *             *---------*
+     *             1[10]     5[8]
+     */
+
     textCords = {
-            uvScale.x,uvScale.y,
+            -uvScale.x,2*uvScale.y,
+            0.0,2*uvScale.y,
             0.0,uvScale.y,
-            0.0,0.0,
-            uvScale.x,0.0,
+            -uvScale.x,uvScale.y,
 
-            2*uvScale.x,uvScale.y,
-            3*uvScale.x,uvScale.y,
-            3*uvScale.x,0.0,
-            2*uvScale.x,0.0,
+            -2*uvScale.x,2*uvScale.y,
+            -3*uvScale.x,2*uvScale.y,
+            -3*uvScale.x,uvScale.y,
+            -2*uvScale.x,uvScale.y,
 
-            2*uvScale.x,2*uvScale.y,
+            -2*uvScale.x,3*uvScale.y,
 
-            3*uvScale.x,2*uvScale.y,
-            4*uvScale.x,uvScale.y,
+            -4*uvScale.x,2*uvScale.y,
+            -uvScale.x,3*uvScale.y,
 
-            4*uvScale.x,0.0,
-            3*uvScale.x,-uvScale.y,
+            -4*uvScale.x,uvScale.y,
+            -uvScale.x,0.0,
 
-            2*uvScale.x,-uvScale.y
+            -2*uvScale.x,0.0
     };
 
     calculateNormals();
-    cout << "Normals: " << endl;
-    for(int i = 0; i < normals.size(); ++i){
-        cout << normals.at(i) << ", ";
-        if((i+1) % 3 == 0){
-            cout << endl;
-        }
-    }
 }
 
 
@@ -411,6 +409,7 @@ Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float ma
     this->dynamic = dynamic;
     this->scWidth = scWidth;
     this->scHeight = scHeight;
+    this->cubemap = false;
 
     if(shape == Shape::Cube){
         generateCube();
@@ -424,7 +423,7 @@ Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float ma
     assignBuffandArr();
 }
 
-Object::Object(glm::vec3 position, glm::vec3 scale, Shape shape, string textureFilename, glm::vec2 uvScale, int scWidth, int scHeight){
+Object::Object(glm::vec3 position, glm::vec3 scale, Shape shape, string textureFilename, glm::vec2 uvScale, bool cubemap, int scWidth, int scHeight){
     this->position = position;
     this->scale = scale;
     this->velocity = glm::vec3(0.0f);
@@ -432,6 +431,7 @@ Object::Object(glm::vec3 position, glm::vec3 scale, Shape shape, string textureF
     this->spin = glm::vec3(0.0f);
     this->textureFilename = textureFilename;
     this->uvScale = uvScale;
+    this->cubemap = cubemap;
     this->dynamic = false;
     this->scWidth = scWidth;
     this->scHeight = scHeight;
@@ -487,6 +487,14 @@ void Object::move(float deltaTime) {
  * Applys any transformations the object has had and displays the object
  */
 void Object::display(Shader* shader) {
+    if(!cubemap){
+        glCullFace(GL_FRONT);
+        //glDepthMask(GL_TRUE);
+    }else{
+        glCullFace(GL_BACK);
+        //glDepthMask(GL_FALSE);
+    }
+
     //Calculating Transforms:
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
