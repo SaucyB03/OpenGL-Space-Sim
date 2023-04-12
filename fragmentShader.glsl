@@ -14,10 +14,9 @@ uniform sampler2D texture1;
 
 void main()
 {
-    // linearly interpolate between both textures (80% container, 20% awesomeface)
     //FragColor = texture(texture1, TexCoord);
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * vec3(1.0,0.75,0.75);
+    float ambientStrength = 0.5;
+    vec3 ambient = ambientStrength * vec3(1.0,0.8,0.8);
 
     // diffuse
     vec3 norm = normalize(Normal);
@@ -33,5 +32,6 @@ void main()
 
     vec3 result = (ambient + diffuse);
     FragColor = texture(texture1, TexCoord) * vec4(result, 1.0);
-    //FragColor = vec4(1.0,0.5,0.5,1.0);
+
+//      FragColor = vec4(1.0,0.5, 1.0, 1.0);
 }

@@ -93,13 +93,24 @@ void Object::assignBuffandArr(){
 }
 
 void Object::generateSphere() {
+    //Diagram of texture Unwrapping  +  Vertex# [spot in vertices arr]
+    /*
+     *        *   *   *   *   *               0[1],  0[3],  0[5],  0[7],  0[9]
+     *       / \ / \ / \ / \ / \
+     *      *---*---*---*---*---*          1[0],  2[2],  3[4],  4[6],  5[8],  1[10]
+     *     / \ / \ / \ / \ / \ /
+     *    *---*---*---*---*---*         6[11], 7[13], 8[15], 9[17], 10[19], 11[21]
+     *     \ / \ / \ / \ / \ /
+     *      *   *   *   *   *              12[12], 12[14], 12[16], 12[18], 12[20]
+     */
+
     float radius = scale.x/2;
 
-    float phi, theta, LRot, x, y, z, tx = 0.0, ty = 1.0;
+    float phi, theta, LRot, x, y, z, tx = 0.5, ty = 1.0;
     int i, index = 0;
     for(i = 1; i <= 12; ++i) {
         phi = atan(0.5f);
-        theta = 2 * M_PI / 5 * i - LRot;
+        theta = 2 * M_PI / 5 * i - 2*LRot;
 
         if (i < 6) {
             x = radius * cos(phi) * cos(theta);
@@ -107,7 +118,7 @@ void Object::generateSphere() {
             z = radius * cos(phi) * sin(theta);
 
             addIndices(indices, {index + 1, index, index + 2});
-            addIndices(indices, {index + 2, index, index + 11});
+            addIndices(indices, {index + 2, index, index + 13});
             addVerts(vertices, {x, y, z});
             addVerts(vertices, {0.0, scale.y / 2, 0.0});
 
@@ -125,7 +136,7 @@ void Object::generateSphere() {
             z = radius * cos(-phi) * sin(theta);
 
             addIndices(indices, {index - 1, index, index + 1});
-            addIndices(indices, {index - 10, index - 1, index + 1});
+            addIndices(indices, {index - 12, index - 1, index + 1});
             addVerts(vertices, {x, y, z});
             addVerts(vertices, {0.0, -scale.y / 2, 0.0});
 
@@ -154,11 +165,19 @@ void Object::generateSphere() {
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
 
-            tx = 0.5f;
+            tx = 0.0f;
             ty = 2.0f;
 
             LRot = M_PI/5;
             index += 2;
+        }
+    }
+
+    cout << "indices: " << endl;
+    for(i = 0; i < indices.size(); ++i){
+        cout << indices.at(i) << ", ";
+        if((i+1)% 3 == 0){
+            cout << endl;
         }
     }
 
@@ -405,6 +424,30 @@ Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float ma
     assignBuffandArr();
 }
 
+Object::Object(glm::vec3 position, glm::vec3 scale, Shape shape, string textureFilename, glm::vec2 uvScale, int scWidth, int scHeight){
+    this->position = position;
+    this->scale = scale;
+    this->velocity = glm::vec3(0.0f);
+    this->mass = 0.0f;
+    this->spin = glm::vec3(0.0f);
+    this->textureFilename = textureFilename;
+    this->uvScale = uvScale;
+    this->dynamic = false;
+    this->scWidth = scWidth;
+    this->scHeight = scHeight;
+
+    if(shape == Shape::Cube){
+        generateCube();
+    }else if(shape == Shape::Sphere){
+        generateSphere();
+    }else{
+        cout<< "ERROR: Invalid Shape Entered: " << endl;
+        terminate();
+    }
+
+    assignBuffandArr();
+}
+
 //Destructor: deletes the created buffers
 Object::~Object() {
     glDeleteBuffers(GL_ELEMENT_ARRAY_BUFFER, &this->eb);
@@ -448,15 +491,14 @@ void Object::display(Shader* shader) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
 
-    glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+    glm::mat4 model = glm::mat4(1.0f);
 
 
     model = glm::translate(model, position);
-    //model = glm::translate(model, {-scale.x/2, 0.0,-scale.z/2});
+
     model = glm::rotate(model, glm::radians(angle.x), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, glm::radians(angle.y), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, glm::radians(angle.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    //model = glm::translate(model, {scale.x/2, 0.0,scale.z/2});
 
     shader->setInt("texture1", 0);
     shader->setUniformMat4("model", model);
@@ -468,7 +510,8 @@ void Object::display(Shader* shader) {
 }
 
 void Object::addForce(glm::vec3 otherObjPos, float otherObjMass) {
-    float dist = 10 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
+    float dist = 1000000 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
+    //float dist = 100 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
 
     float totalForce = UNIVERSAL_GRAVITY_CONSTANT * mass * otherObjMass / (dist*dist);
 

@@ -12,8 +12,8 @@
 using namespace std;
 
 
-const int SC_WIDTH = 3200;
-const int SC_HEIGHT = 1600;
+int SC_WIDTH = 3200;
+int SC_HEIGHT = 1600;
 
 Camera* camera;
 
@@ -53,9 +53,15 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    //glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
+//    int count;
+//    GLFWmonitor **monitors = glfwGetMonitors(&count);
+//    const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
+//    SC_WIDTH = mode->width;
+//    SC_HEIGHT = mode->height;
     GLFWwindow* window;
-    window = glfwCreateWindow(SC_WIDTH, SC_HEIGHT, "Basic Game", NULL, NULL);
+    window = glfwCreateWindow(SC_WIDTH, SC_HEIGHT, "Space Simulation", NULL, NULL);
 
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -84,7 +90,7 @@ int main(){
 
     Shader* lightSourceshader = new Shader("../vertexLightSourceShader.glsl", "../fragmentLightSourceShader.glsl");
     Shader* shader = new Shader("../vertexShader.glsl", "../fragmentShader.glsl");
-    camera = new Camera({0.0,3.0,10.0}, {0.0,0.0,-1.0},{0.0,1.0,0.0});
+    camera = new Camera({-100.0,100.0,0.0}, {0.0,-1.0,0.0},{0.0,1.0,0.0});
 
     //Texture Files:
     string sunTex = "../textures/ExaggeratedSunTexture.jpg";
@@ -93,14 +99,18 @@ int main(){
     string earthTex = "../textures/EarthIcoTexture.png"; // must set objects uvScale to (0.181818,0.333333) for texture to appear correct...   5.5 triangles wide, 3 triangles tall : (1/5.5, 1/3)
 
     vector<Object*> planets;
-    planets.push_back(new Object(glm::vec3(5.0, 3,0.0), glm::vec3(2.0,2.0,2.0), glm::vec3(0.0,0.0,2.0), 10000000000000.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(0.0, 3,-10.0), glm::vec3(0.5,0.5,0.5), glm::vec3(1.0,0.0,0.0), 1000000.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(-5.0, 3,0.0), glm::vec3(2.0,2.0,2.0), glm::vec3(0.0,0.0,-2.0), 10000000000000.0f, glm::vec3(0.0f, 20.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(0.0, 3,5.0), glm::vec3(0.5,0.5,0.5), glm::vec3(1.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(2.0, 4,5.0), glm::vec3(0.5,0.5,0.5), glm::vec3(1.0,0.0,0.0), 100.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Sphere, planetTex, 1.0f, true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(152.10, 3,0.0), glm::vec3(1.2756,1.2756,1.2756), glm::vec3(0.0,0.0,40.0), 5.9724 * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(152.10, 3,3.0), glm::vec3(0.75,0.75,0.75), glm::vec3(1.0,0.0,40.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(-100.0, 3,3.0), glm::vec3(3,3,3), glm::vec3(0.0,0.0,30.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
 
 
-    Object ground = *new Object(glm::vec3(-2,-5.0,2.0), glm::vec3(50,0.25,50), glm::vec3(0.0,0.0,0.0), 0.0f, glm::vec3(1.0f, 0.5f, 0.2f), Shape::Cube, uvTex, glm::vec2(5.0f,5.0f), false, SC_WIDTH, SC_HEIGHT);
+//    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(2.0,2.0,0.5), glm::vec3(0.0,0.0,0.0), pow(10,15), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(0.0, 3,12.0), glm::vec3(0.5,0.5,0.5), glm::vec3(10.0,0.0,0.0), pow(10,13), glm::vec3(0.0f, -100.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(0.5, 3,12.0), glm::vec3(0.25,0.25,0.25), glm::vec3(1.0,0.0,0.0), 100.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
+
+
+    Object ground = *new Object(glm::vec3(-2,-5.0,2.0), glm::vec3(50,0.25,50), Shape::Cube, uvTex, glm::vec2(5.0f,5.0f), SC_WIDTH, SC_HEIGHT);
     glfwSetCursorPosCallback(window, mouseCallback);
 
     glm::mat4 projection = glm::mat4(1.0f);
@@ -117,7 +127,7 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         checkInput(window, deltaTime);
-        projection = glm::perspective(glm::radians(45.0f), (float) SC_WIDTH / (float) SC_HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float) SC_WIDTH / (float) SC_HEIGHT, 1.0f, 1000.0f);
 
         int i,j;
         for(i = 0; i < planets.size(); ++i){
