@@ -72,13 +72,18 @@ void Object::assignBuffandArr(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     unsigned char *data = stbi_load(textureFilename.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
+        if(textureFilename.substr(textureFilename.size()-3) == "jpg"){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }else{
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
@@ -90,7 +95,7 @@ void Object::assignBuffandArr(){
 void Object::generateSphere() {
     float radius = scale.x/2;
 
-    float phi, theta, LRot, x, y, z, tx = 0.0, ty = 0.0;
+    float phi, theta, LRot, x, y, z, tx = 0.0, ty = 1.0;
     int i, index = 0;
     for(i = 1; i <= 12; ++i) {
         phi = atan(0.5f);
@@ -108,10 +113,10 @@ void Object::generateSphere() {
 
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
-            textCords.push_back((tx + uvScale.x/2) * uvScale.x);
-            textCords.push_back((ty - uvScale.y) * uvScale.y);
+            textCords.push_back((tx + 0.5f) * uvScale.x);
+            textCords.push_back((ty - 1.0f) * uvScale.y);
 
-            tx += uvScale.x;
+            tx += 1.0f;
 
             index += 2;
         } else if (i > 6 && i < 12) {
@@ -126,10 +131,10 @@ void Object::generateSphere() {
 
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
-            textCords.push_back((tx + uvScale.x/2) * uvScale.x);
-            textCords.push_back((ty + uvScale.y) * uvScale.y);
+            textCords.push_back((tx + 0.5f) * uvScale.x);
+            textCords.push_back((ty + 1.0f) * uvScale.y);
 
-            tx += uvScale.x;
+            tx += 1.0;
 
             index += 2;
         } else if(i == 12){
@@ -149,8 +154,8 @@ void Object::generateSphere() {
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
 
-            tx = uvScale.x;
-            ty += uvScale.y;
+            tx = 0.5f;
+            ty = 2.0f;
 
             LRot = M_PI/5;
             index += 2;
@@ -376,12 +381,12 @@ void Object::calculateNormals() {
 /* Object Constructor
  * Holds info about: position, scale, velocity, color, if its dynamic / static, and the screen size
  */
-Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 color, Shape shape, string textureFilename, glm::vec2 uvScale, bool dynamic, int scWidth, int scHeight){
+Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 velocity, float mass, glm::vec3 spin, Shape shape, string textureFilename, glm::vec2 uvScale, bool dynamic, int scWidth, int scHeight){
     this->position = position;
     this->scale = scale;
     this->velocity = velocity;
     this->mass = mass;
-    this->color = color;
+    this->spin = spin;
     this->textureFilename = textureFilename;
     this->uvScale = uvScale;
     this->dynamic = dynamic;
@@ -409,12 +414,19 @@ Object::~Object() {
  * if there's a velocity on the object then it updates it from the last frame
  */
 void Object::move(float deltaTime) {
-    if(currentForce.x != 0 || currentForce.y != 0 || currentForce.z != 0){
+    if(currentForce != glm::vec3(0.0f)){
         velocity.x += (currentForce.x / mass) * deltaTime;
         velocity.y += (currentForce.y / mass) * deltaTime;
         velocity.z += (currentForce.z / mass) * deltaTime;
 
     }
+
+    if(spin != glm::vec3(0.0f)){
+        angle.x += spin.x * deltaTime;
+        angle.y += spin.y * deltaTime;
+        angle.z += spin.z * deltaTime;
+    }
+
     if(dynamic) {
         if (velocity.x != 0) {
             position.x += velocity.x * deltaTime;
