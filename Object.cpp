@@ -368,13 +368,14 @@ glm::vec3 Object::findMidpoint(int vertex1, int vertex2, float radius, string ty
 }
 
 
-
+//simplifies adding (float)vec3's to a vector<>
 void Object::addVerts(vector<float> &vector, glm::vec3 info) {
     vector.push_back(info.x);
     vector.push_back(info.y);
     vector.push_back(info.z);
 }
 
+//simplifies adding (int)vec3's to a vector<>
 void Object::addIndices(vector<int> &vector, glm::vec3 info) {
     vector.push_back((int) info.x);
     vector.push_back((int) info.y);
@@ -382,14 +383,19 @@ void Object::addIndices(vector<int> &vector, glm::vec3 info) {
 
 }
 
+//Calculates the objects (vertex) normals
 void Object::calculateNormals() {
     for(int i = 0; i < vertices.size(); i += 3){
+        //get vertices local position
         glm::vec3 vertPos = {vertices.at(i), vertices.at(i + 1), vertices.at(i + 2)};
 
+        //since the shapes are generated from the middle the vertex normal can simply be calculated
+        //by finding its unit vector:
         vertPos.x = vertPos.x / scale.x;
         vertPos.y = vertPos.y / scale.y;
         vertPos.z = vertPos.z / scale.z;
 
+        //add to normal vector<>
         addVerts(normals,vertPos);
     }
 }
@@ -457,6 +463,7 @@ Object::~Object() {
  * if there's a velocity on the object then it updates it from the last frame
  */
 void Object::move(float deltaTime) {
+    //if there is a force on the object, update its velocity size last frame
     if(currentForce != glm::vec3(0.0f)){
         velocity.x += (currentForce.x / mass) * deltaTime;
         velocity.y += (currentForce.y / mass) * deltaTime;
@@ -464,12 +471,14 @@ void Object::move(float deltaTime) {
 
     }
 
+    //if the object is spinning update its local rotation since last frame
     if(spin != glm::vec3(0.0f)){
         angle.x += spin.x * deltaTime;
         angle.y += spin.y * deltaTime;
         angle.z += spin.z * deltaTime;
     }
 
+    //if the object is dynamic then update the position since last frame given its velocity
     if(dynamic) {
         if (velocity.x != 0) {
             position.x += velocity.x * deltaTime;
@@ -487,27 +496,27 @@ void Object::move(float deltaTime) {
  * Applys any transformations the object has had and displays the object
  */
 void Object::display(Shader* shader) {
+
+    //If this object is a cubemap then display the inside faces:
     if(!cubemap){
         glCullFace(GL_FRONT);
-        //glDepthMask(GL_TRUE);
     }else{
         glCullFace(GL_BACK);
-        //glDepthMask(GL_FALSE);
     }
 
-    //Calculating Transforms:
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
 
+    //Calculating Transforms:
     glm::mat4 model = glm::mat4(1.0f);
-
-
     model = glm::translate(model, position);
 
     model = glm::rotate(model, glm::radians(angle.x), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, glm::radians(angle.y), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, glm::radians(angle.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
+    //Setting Uniforms:
     shader->setInt("texture1", 0);
     shader->setUniformMat4("model", model);
 
@@ -518,8 +527,8 @@ void Object::display(Shader* shader) {
 }
 
 void Object::addForce(glm::vec3 otherObjPos, float otherObjMass) {
-    //float dist = 1000000 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
-    float dist = 100 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
+    float dist = 1000000 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
+//    float dist = 100 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
 
     float totalForce = UNIVERSAL_GRAVITY_CONSTANT * mass * otherObjMass / (dist*dist);
 
