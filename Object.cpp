@@ -55,6 +55,7 @@ void Object::assignBuffandArr(){
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    //Enables faceculling so faces facing the other direction from the camera arent being displayed
     glEnable(GL_CULL_FACE);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -106,22 +107,28 @@ void Object::generateSphere() {
 
     float radius = scale.x/2;
 
+
+    //Algorithm that initializes the unsubdivided icosphere's vertices defines the triangles + textcords
     float phi, theta, LRot, x, y, z, tx = 0.5, ty = 1.0;
     int i, index = 0;
     for(i = 1; i <= 12; ++i) {
         phi = atan(0.5f);
         theta = 2 * M_PI / 5 * i - 2*LRot;
 
+        //if bottom half of sphere make the y-cord(up/down) negative else positive
         if (i < 6) {
+            //calculate vertex positions
             x = radius * cos(phi) * cos(theta);
             y = radius * sin(phi);
             z = radius * cos(phi) * sin(theta);
 
+            //add triangle definitions and vertices
             addIndices(indices, {index + 1, index, index + 2});
             addIndices(indices, {index + 2, index, index + 13});
             addVerts(vertices, {x, y, z});
             addVerts(vertices, {0.0, scale.y / 2, 0.0});
 
+            //define teh vertices textcords
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
             textCords.push_back((tx + 0.5f) * uvScale.x);
@@ -131,15 +138,18 @@ void Object::generateSphere() {
 
             index += 2;
         } else if (i > 6 && i < 12) {
+            //calculate vertex positions
             x = radius * cos(-phi) * cos(theta);
             y = radius * sin(-phi);
             z = radius * cos(-phi) * sin(theta);
 
+            //add triangle definitions and vertices
             addIndices(indices, {index - 1, index, index + 1});
             addIndices(indices, {index - 12, index - 1, index + 1});
             addVerts(vertices, {x, y, z});
             addVerts(vertices, {0.0, -scale.y / 2, 0.0});
 
+            //define the vertices textcords
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
             textCords.push_back((tx + 0.5f) * uvScale.x);
@@ -149,18 +159,22 @@ void Object::generateSphere() {
 
             index += 2;
         } else if(i == 12){
+            //calculate vertex positions
             x = radius * cos(-phi) * cos(theta);
             y = radius * sin(-phi);
             z = radius * cos(-phi) * sin(theta);
 
+            //add texture cords and vertices
             addVerts(vertices, {x, y, z});
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
         }else{
+            //calculate vertex positions
             x = radius * cos(phi) * cos(theta);
             y = radius * sin(phi);
             z = radius * cos(phi) * sin(theta);
 
+            //add texture cords and vertices
             addVerts(vertices, {x, y, z});
             textCords.push_back(tx * uvScale.x);
             textCords.push_back(ty * uvScale.y);
@@ -178,7 +192,9 @@ void Object::generateSphere() {
     calculateNormals();
 }
 
+//Method to generate a cube
 void Object::generateCube() {
+    //Cube vertex index numbers
     //  6*------------*5
     //  /|           /|
     //2*------------*1|
@@ -187,6 +203,7 @@ void Object::generateCube() {
     // |/           |/
     //3*------------*0
 
+    //initialize vertices
     vertices = {
             scale.x/2,  -scale.y/2,    scale.z/2,  /* front bottom right */
             scale.x/2,  scale.y/2,    scale.z/2,  /* front top right */
@@ -210,10 +227,12 @@ void Object::generateCube() {
             -scale.x/2,  scale.y/2,   -scale.z/2  //vert #6 | 13
 
     };
+
+    //Defining the triangles that make up the cube
     indices = {
             3, 1, 0,  // first Triangle
             1, 3, 2,   // second Triangle
-            4, 6, 7,
+            4, 6, 7,  //ect...
             6, 4, 5,
             7, 0, 4,
             0, 7, 3,
@@ -225,6 +244,7 @@ void Object::generateCube() {
             3, 13, 12
     };
 
+    //Diagram of Cube unwrapped:
     /*             2[12]     6[13]
      *             *---------*
      *             |         |
@@ -239,6 +259,8 @@ void Object::generateCube() {
      *             1[10]     5[8]
      */
 
+
+    //Defining of texture cords:
     textCords = {
             -uvScale.x,2*uvScale.y,
             0.0,2*uvScale.y,
@@ -265,7 +287,8 @@ void Object::generateCube() {
 }
 
 
-
+//Subdivides the sphere by taking each triangle and then subdividing each of its edges
+//Then moves that vertex to the edge of the sphere by radius distance from the center
 void Object::subdivideSphere(float radius) {
     int numTriangles;
 
@@ -273,20 +296,24 @@ void Object::subdivideSphere(float radius) {
     vector<int> subbedIndices;
     vector<float> subbedTextCord;
 
+    //Loop through the number of subdivisions we want
     int indexs;
     for(int i = 1; i < SPHERE_SUB; ++i){
         indexs = 0;
         numTriangles = indices.size();
+
+        //Subdivide eahc line
         for(int j = 0; j < numTriangles; j += 3){
             int v1 = indices.at(j);
             int v2 = indices.at(j+1);
             int v3 = indices.at(j+2);
 
-
+            //Calculate each edges midpoint
             glm::vec3 midVec12 = findMidpoint(v1,v2, radius, "vertices");
             glm::vec3 midVec13 = findMidpoint(v1,v3, radius, "vertices");
             glm::vec3 midVec23 = findMidpoint(v2,v3, radius, "vertices");
 
+            //Add new vertices to vector<>
             addVerts(subbedVertices, {vertices.at(v1*3),vertices.at(v1*3 + 1), vertices.at(v1*3 + 2)});
 
             addVerts(subbedVertices, midVec12);
@@ -299,10 +326,13 @@ void Object::subdivideSphere(float radius) {
 
             addVerts(subbedVertices, midVec23);
 
+
+            //Find midpoint for texture coordinates
             glm::vec3 midTex12 = findMidpoint(v1,v2, radius, "textCords");
             glm::vec3 midTex13 = findMidpoint(v1,v3, radius, "textCords");
             glm::vec3 midTex23 = findMidpoint(v2,v3, radius, "textCords");
 
+            //add new textcords
             subbedTextCord.push_back(textCords.at(v1*2));
             subbedTextCord.push_back(textCords.at(v1*2 + 1));
             subbedTextCord.push_back(midTex12.x);
@@ -316,7 +346,7 @@ void Object::subdivideSphere(float radius) {
             subbedTextCord.push_back(midTex23.x);
             subbedTextCord.push_back(midTex23.y);
 
-            // compute 3 new vertices by spliting half on each edge
+            // Diagram of each triangle's subdivision:
             //         v1
             //        / \
             // newV1 *---* newV3
@@ -324,7 +354,7 @@ void Object::subdivideSphere(float radius) {
             //    v2---*---v3
             //       newV2
 
-
+            //add the 4 triangles to the indices array
             addIndices(subbedIndices, {indexs,indexs+1, indexs+3});
             addIndices(subbedIndices, {indexs+1,indexs+2, indexs+5});
             addIndices(subbedIndices, {indexs+4,indexs+3, indexs+5});
@@ -333,6 +363,8 @@ void Object::subdivideSphere(float radius) {
             indexs += 6;
 
         }
+
+        //set each corresponding vector to their subdivided one
         vertices = subbedVertices;
         indices = subbedIndices;
         textCords = subbedTextCord;
@@ -342,18 +374,19 @@ void Object::subdivideSphere(float radius) {
     }
 }
 
+//Finds the midpoint between 2 vertices
 glm::vec3 Object::findMidpoint(int vertex1, int vertex2, float radius, string type) {
 
     glm::vec3 p1Cords = glm::vec3(0.0f);
     glm::vec3 p2Cords = glm::vec3(0.0f);
     glm::vec3 midpoint = glm::vec3(0.0f);
 
+    //checks what type of vertex to be subdivided (vertices = vec3, texCords = vec2)
     if(type == "vertices") {
         p1Cords = {vertices.at(vertex1 * 3), vertices.at(vertex1 * 3 + 1), vertices.at(vertex1 * 3 + 2)};
         p2Cords = {vertices.at(vertex2 * 3), vertices.at(vertex2 * 3 + 1), vertices.at(vertex2 * 3 + 2)};
 
-        midpoint = {(p1Cords.x + p2Cords.x) / 2, (p1Cords.y + p2Cords.y) / 2,
-                              (p1Cords.z + p2Cords.z) / 2};
+        midpoint = {(p1Cords.x + p2Cords.x) / 2, (p1Cords.y + p2Cords.y) / 2,(p1Cords.z + p2Cords.z) / 2};
 
         float scaling = radius / sqrt(midpoint.x * midpoint.x + midpoint.y * midpoint.y + midpoint.z * midpoint.z);
         midpoint *= scaling;

@@ -1,4 +1,3 @@
-//spinesquare
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -69,7 +68,6 @@ int main(){
     GLFWwindow* window;
     window = glfwCreateWindow(SC_WIDTH, SC_HEIGHT, "Space Simulation", monitors[1], NULL);
 
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     //make sure the window was created
@@ -111,22 +109,14 @@ int main(){
     //Planets apart of the scene (if not stored in the vector, force on other objects wont be applied)
     //Index 0 is the sun
     vector<Object*> planets;
-//    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(152.10, 3,0.0), glm::vec3(1.2756,1.2756,1.2756), glm::vec3(0.0,0.0,40.0), 5.9724 * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(152.10, 3,3.0), glm::vec3(0.75,0.75,0.75), glm::vec3(1.0,0.0,40.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(-100.0, 3,3.0), glm::vec3(3,3,3), glm::vec3(0.0,0.0,30.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-
     planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(100, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,40.0), 1988500.0f * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(152.10, 3,0.0), glm::vec3(1.2756,1.2756,1.2756), glm::vec3(0.0,0.0,40.0), 5.9724 * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(152.10, 3,3.0), glm::vec3(0.75,0.75,0.75), glm::vec3(1.0,0.0,40.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(-100.0, 3,3.0), glm::vec3(3,3,3), glm::vec3(0.0,0.0,30.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
 
+//    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(100, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,40.0), 1988500.0f * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
 
-//    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(2.0,2.0,0.5), glm::vec3(0.0,0.0,0.0), pow(10,15), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(0.0, 3,12.0), glm::vec3(0.5,0.5,0.5), glm::vec3(10.0,0.0,0.0), pow(10,13), glm::vec3(0.0f, -100.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(0.5, 3,12.0), glm::vec3(0.25,0.25,0.25), glm::vec3(1.0,0.0,0.0), 100.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(0.5, 10,-12.0), glm::vec3(0.25,0.25,0.25), glm::vec3(5.0,0.0,0.0), 100.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(0.0, 10,12.0), glm::vec3(0.25,0.25,0.25), glm::vec3(-5.0,2.0,0.0), 100.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(10.5, 10,-12.0), glm::vec3(0.25,0.25,0.25), glm::vec3(-5.0,1.0,1.0), 100.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(4.5, 5,12.0), glm::vec3(0.25,0.25,0.25), glm::vec3(0.0,-1.0,0.0), 100.0f, glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
 
 
     //Skybox background img object

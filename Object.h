@@ -13,8 +13,7 @@
 
 #include "Shader.h"
 
-const double APPARENT_GRAVITY = 981;
-
+//Shape Types:
 enum Shape{
     Cube,
     Sphere
@@ -22,6 +21,7 @@ enum Shape{
 
 class Object {
 private:
+    //Constants:
     const int SPHERE_SUB = 3;
     const float UNIVERSAL_GRAVITY_CONSTANT = 6.673 * pow(10, -11);
 
@@ -41,6 +41,8 @@ private:
 
     string textureFilename;
 
+
+    //Object information for buffers
     vector<float> vertices;
     vector<int> indices;
     vector<float> textCords;
@@ -57,14 +59,18 @@ private:
      */
     void assignBuffandArr();
 
+    //Generates the respective 3D Shapes
     void generateSphere();
     void generateCube();
 
-
+    //Subdivide Sphere: subdivides the sphere by the given global amount
     void subdivideSphere(float radius);
+    //findMidpoint: calulcates the midpoint between 2 vertex's
     glm::vec3 findMidpoint(int vertex1, int vertex2, float radius, string type);
+    //calculate normals: calculates the vertex normals of the shape
     void calculateNormals();
 
+    //Simplifies adding vec3's to vectors<>
     void addVerts(vector<float> &vector, glm::vec3 info);
     void addIndices(vector<int> &vector, glm::vec3 info);
 public:
@@ -101,13 +107,16 @@ public:
      */
     glm::vec3 getScale();
 
+    //Get mass: returns the mass of the object
     float getMass();
 
     /* setVelocity
      * sets the velocity to the inputted vec2
      */
     void setVelocity(glm::vec3 newVelocity);
+    //setAngle changes the angle of the object (for spin)
     void setAngle(glm::vec3 add);
+    //setFroce sets the force of the object
     void setForce(glm::vec3 force);
 };
 
