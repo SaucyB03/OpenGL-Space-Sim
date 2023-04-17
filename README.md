@@ -1,4 +1,4 @@
-# M4OEP-bksoucy
+# M4OEP-bksoucy-kjablon4
 
 ##Bradon Soucy and Kamila Jablonowski
 - GLFW, glm, OpenGL, std_image
