@@ -1,15 +1,21 @@
-# M4OEP-bksoucy-kjablon4
+# OpenGL Space Simulation
 
-## Bradon Soucy and Kamila Jablonowski
-## Downloads:
-- GLFW, glm, OpenGL, std_image
-## Our Project Includes:
-- Our project is a space simulation that visualizes different planet sizes and speeds and see how they orbit. It demonstrates the  use of shaders, mouse and keyboard listeners, drawing of the planets, and use of timers.
-## Current Bugs:
-- We have no known bugs as of now!
-## What would we add (if more time)?
-- In the future, we would've hoped to install that menu to make it more user friendly however had a hard time finding the ImGui - Clion connection. This would mean the users could implement their own planets with sizes, speeds, and textures themselves and see how it interacts with other planets. Unfortunately, we ran out of time to get this to fully function correctly.
-- Additionally, I would've added toggleable planet tracers (lines that planets leave behind in their orbit) to show the planets orbit better, I started to try and add them but storing their information in the data Buffers was being really weird since the number of vertices would be changing.
+## Required Downloads:
+- OpenGL
+- GLFW
+- glm
+- std_image
+  
+## About Our Project:
+- This project is a semester-long OpenGL experience, slowly learning each of the intricate pieces along the way to display what you see in this code. Also, check out my other repos for my earlier OpenGL creations to see how I got here!
+
+## What does it do?
+This project allows you to create planets of varying size, texture, mass, spin, initial velocity, and initial position. Then when the program runs, it takes those inputs and calculates the trajectory, allowing you to simulate realistic planet / gravity-based simulations.
+
+## The Future:
+- Hope to add IMGUI to enable real-time editing and creation of planets to give it a more interactive feel.
+- I also want to add toggleable planet tracers, that fade out after a set interval of time, allowing the user to watch the paths of the planets evolve over time.
+  
 ## Citations
 ### How spheres are generated
 - http://www.songho.ca/opengl/gl_sphere.html
@@ -17,6 +23,3 @@
 ### OpenGL Help
 - https://learnopengl.com/Getting-started/OpenGL
 - https://docs.gl/
-
-## What grade do we deserve?
-- We think we deserve a 98 because of the amount of time and effort that was put into this! The use of multiple graphics programs and a clear 3D visualization of our projects potential and complex idea.
