@@ -7,6 +7,8 @@
 
 #include "Object.h"
 #include "Camera.h"
+#include "GUI.h"
+#include "Text.h"
 
 using namespace std;
 
@@ -70,7 +72,7 @@ int main(int argc, char** argv){
     GLFWwindow* window;
     window = glfwCreateWindow(SC_WIDTH, SC_HEIGHT, "Space Simulation", monitors[0], NULL);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
     //make sure the window was created
@@ -91,7 +93,7 @@ int main(int argc, char** argv){
         return -1;
     }
 
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -99,6 +101,10 @@ int main(int argc, char** argv){
     //Initialize Shaders:
     Shader* lightSourceshader = new Shader("../vertexLightSourceShader.glsl", "../fragmentLightSourceShader.glsl");
     Shader* shader = new Shader("../vertexShader.glsl", "../fragmentShader.glsl");
+    Shader* guiShader = new Shader("../vertexGUIShader.glsl", "../fragmentGUIShader.glsl");
+    Shader* texShader = new Shader("../vertexTextShader.glsl", "../fragmentTextShader.glsl");
+    glm::mat4 guiProjection = glm::ortho(0.0f, (float)SC_WIDTH, 0.0f, (float)SC_HEIGHT, -10.0f,10.0f);
+
 
 
     //Define the global camera object
@@ -111,6 +117,8 @@ int main(int argc, char** argv){
     string cubeMap = "../textures/cubemap.png";
     string earthTex = "../textures/EarthIcoTexture.png"; // must set objects uvScale to (0.181818,0.333333) for texture to appear correct...   5.5 triangles wide, 3 triangles tall : (1/5.5, 1/3)
 
+//    Initialize GUI:
+    GUI* gui = new GUI(SC_WIDTH, SC_HEIGHT);
 
     //Planets apart of the scene (if not stored in the vector, force on other objects wont be applied)
     //Index 0 is the sun
@@ -128,6 +136,7 @@ int main(int argc, char** argv){
     //Skybox background img object
     Object skybox = *new Object(glm::vec3(0,0.0,0.0), glm::vec3(500,500,500), Shape::Cube, cubeMap, glm::vec2(0.25f,0.3333333f), true, SC_WIDTH, SC_HEIGHT);
     glfwSetCursorPosCallback(window, mouseCallback);
+    Text text;
 
 
     glm::mat4 projection = glm::mat4(1.0f);
@@ -135,6 +144,7 @@ int main(int argc, char** argv){
 
     //Game Loop:
     while(!glfwWindowShouldClose(window)){
+        glEnable(GL_DEPTH_TEST);
         //Calculate deltaTime:
         auto endTime = std::chrono::high_resolution_clock::now();
         double deltaTime = std::chrono::duration<double, std::milli>(endTime - startTime).count();
@@ -145,7 +155,13 @@ int main(int argc, char** argv){
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
         checkInput(window, deltaTime);
+        gui->checkInput(window);
+
+//                TODO: Implement adding of planets:
+
+
 
         //Calculate the current cameras perspective:
         projection = glm::perspective(glm::radians(45.0f), (float) SC_WIDTH / (float) SC_HEIGHT, 1.0f, 1000.0f);
@@ -190,6 +206,15 @@ int main(int argc, char** argv){
 
         //Display the Background
         skybox.display(shader);
+
+        glDisable(GL_DEPTH_TEST);
+        guiShader->bindShader();
+        guiShader->setUniformMat4("projection",guiProjection);
+        texShader->bindShader();
+        texShader->setUniformMat4("projection",guiProjection);
+
+        gui->RenderGUI(guiShader, texShader);
+        text.RenderText(texShader, "Press . (Period) to toggle GUI", {SC_WIDTH/2, SC_HEIGHT}, 1.0f, glm::vec3(1.0, 1.0f, 1.0f), new Alignment[2]{Center, Top});
 
         //refresh the window
         glfwSwapBuffers(window);

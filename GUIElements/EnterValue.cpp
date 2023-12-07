@@ -5,7 +5,7 @@
 #include "EnterValue.h"
 
 
-EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius, float initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : Object(position, scale, rsRadius, color, shape, scrWidth, scrHeight){
+EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius, float initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : guiObject(position, scale, rsRadius, color, guiShape, scrWidth, scrHeight){
     this->fvalue = initialValue;
     this->inView = inView;
     this->texCol = texCol;
@@ -15,7 +15,7 @@ EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Sha
     updateString();
 }
 
-EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius, string initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : Object(position, scale, rsRadius, color, shape, scrWidth, scrHeight){
+EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius, string initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : guiObject(position, scale, rsRadius, color, guiShape, scrWidth, scrHeight){
     this->svalue = initialValue;
     this->inView = inView;
     this->texCol = texCol;
@@ -27,8 +27,8 @@ EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Sha
 
 void EnterValue::display(Shader* shader, Shader* texShader) {
     if(inView) {
-        this->Object::display(shader);
 
+        this->guiObject::display(shader);
 //        updateString();
 
         if (strText != ""){
@@ -82,7 +82,7 @@ bool EnterValue::checkSelect(glm::vec2 mousePos){
     glm::vec2 mPosPix = convertPixToScSp(mousePos);
 
 //    Determine if the button is on the screen if and we are clicking its bounding box:
-//    Also marks if this shape is the selected for key input
+//    Also marks if this guiShape is the selected for key input
     if(inView){
         if(mPosPix.x >= position.x - scale.x/2 && mPosPix.x <= position.x + scale.x/2 && mPosPix.y >= position.y - scale.y/2 && mPosPix.y <= position.y + scale.y/2) {
             isSelected = true;

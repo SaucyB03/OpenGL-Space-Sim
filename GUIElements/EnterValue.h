@@ -5,7 +5,7 @@
 #ifndef PLAYGROUND_ENTERVALUE_H
 #define PLAYGROUND_ENTERVALUE_H
 
-#include "../object.h"
+#include "guiObject.h"
 #include "../Text.h"
 
 #include <typeinfo>
@@ -15,7 +15,7 @@ enum EVType{
     STRING
 };
 
-class EnterValue : Object {
+class EnterValue : guiObject {
 private:
     float fvalue;
     string svalue;
@@ -34,8 +34,8 @@ private:
 
 public:
 
-    EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius, float initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight);
-    EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius, string initialValue, glm::vec3 texCol, bool inView,  int scrWidth, int scrHeight);
+    EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius, float initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight);
+    EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius, string initialValue, glm::vec3 texCol, bool inView,  int scrWidth, int scrHeight);
 
     void display(Shader* shader, Shader* texShader);
 

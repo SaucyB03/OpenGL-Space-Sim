@@ -10,11 +10,11 @@
 #include <glm/glm.hpp>
 
 #include "../Text.h"
-#include "../object.h"
+#include "guiObject.h"
 
 
 
-class Button : public Object {
+class Button : public guiObject {
 private:
     string textStr;
     glm::vec2 texLoc;
@@ -32,19 +32,19 @@ private:
     glm::vec3 toggleCol = {0,0,0};
 
 public:
-    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius,
+    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius,
            string text, glm::vec2 localTexLoc, float texScale, glm::vec3 texCol, Alignment* texAlign,
            bool toggleable, bool defaultVal, bool inView, int scrWidth, int scrHeight);
 
-    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius,
+    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius,
            string text, glm::vec2 localTexLoc, float texScale, glm::vec3 texCol,
            bool toggleable, bool defaultVal, bool inView, int scrWidth, int scrHeight);
 
-    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius,
+    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius,
            string text, float texScale, glm::vec3 texCol, Alignment* texAlign,
            bool toggleable, bool defaultVal, bool inView, int scrWidth, int scrHeight);
 
-    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, Shape shape, float rsRadius,
+    Button(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius,
            bool toggleable, bool defaultVal, bool inView, int scrWidth, int scrHeight);
     ~Button();
 
