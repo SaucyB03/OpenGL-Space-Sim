@@ -58,7 +58,7 @@ void Object::assignBuffandArr(){
     //Enables faceculling so faces facing the other direction from the camera arent being displayed
     glEnable(GL_CULL_FACE);
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
     // texture 1

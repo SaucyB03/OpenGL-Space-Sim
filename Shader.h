@@ -15,10 +15,9 @@
 using namespace std;
 
 class Shader {
-private:
+public:
     unsigned int program;
 
-public:
     /*Constructor
      * recieves vertex / fragment shader files, then calls read to read them into strings
      * then creates the shader using those strings

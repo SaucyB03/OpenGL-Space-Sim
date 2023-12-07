@@ -8,11 +8,6 @@
 #include "Object.h"
 #include "Camera.h"
 
-
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-
 using namespace std;
 
 
@@ -50,12 +45,13 @@ void checkInput(GLFWwindow *window, float deltaTime){
 
 }
 
+
 //Mouse callback function: checks for users mouse movement and then passes that information to the camera
 void mouseCallback(GLFWwindow *window, double x, double y){
     camera->mouseCallback(window,x,y);
 }
 
-int main(){
+int main(int argc, char** argv){
     //Initialize Window
     //Window initialization:
     glfwInit();
@@ -76,6 +72,7 @@ int main(){
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+
     //make sure the window was created
     if (window == NULL)
     {
@@ -84,6 +81,7 @@ int main(){
         return -1;
     }
     glfwMakeContextCurrent(window);
+
 
     // Initialize glew to utilize OpenGl
     if (glewInit() != GLEW_OK)
@@ -94,24 +92,17 @@ int main(){
     }
 
     glEnable(GL_DEPTH_TEST);
-
-// Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-// Setup Platform/Renderer bindings
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("1.0.72");
-// Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
     //Initialize Shaders:
     Shader* lightSourceshader = new Shader("../vertexLightSourceShader.glsl", "../fragmentLightSourceShader.glsl");
     Shader* shader = new Shader("../vertexShader.glsl", "../fragmentShader.glsl");
 
+
     //Define the global camera object
-    camera = new Camera({-100.0,100.0,0.0}, {0.0,-1.0,0.0},{0.0,1.0,0.0});
+    camera = new Camera({0.0,0.0,0.0}, {0.0,-1.0,0.0},{0.0,1.0,0.0});
 
     //Texture Files:
     string sunTex = "../textures/ExaggeratedSunTexture.jpg";
@@ -124,13 +115,13 @@ int main(){
     //Planets apart of the scene (if not stored in the vector, force on other objects wont be applied)
     //Index 0 is the sun
     vector<Object*> planets;
-    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
 //    planets.push_back(new Object(glm::vec3(152.10, 3,0.0), glm::vec3(1.2756,1.2756,1.2756), glm::vec3(0.0,0.0,40.0), 5.9724 * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
 //    planets.push_back(new Object(glm::vec3(152.10, 3,3.0), glm::vec3(0.75,0.75,0.75), glm::vec3(1.0,0.0,40.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
 //    planets.push_back(new Object(glm::vec3(-100.0, 3,3.0), glm::vec3(3,3,3), glm::vec3(0.0,0.0,30.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
 
-//    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(100, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,40.0), 1988500.0f * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
+    planets.push_back(new Object(glm::vec3(100, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,40.0), 1988500.0f * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
 
 
 
@@ -144,12 +135,6 @@ int main(){
 
     //Game Loop:
     while(!glfwWindowShouldClose(window)){
-        // feed inputs to dear imgui, start new frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-
         //Calculate deltaTime:
         auto endTime = std::chrono::high_resolution_clock::now();
         double deltaTime = std::chrono::duration<double, std::milli>(endTime - startTime).count();
@@ -206,23 +191,11 @@ int main(){
         //Display the Background
         skybox.display(shader);
 
-        // render your GUI
-        ImGui::Begin("Demo window");
-        ImGui::Text("Hello!");
-        ImGui::End();
-
-        // Render dear imgui into screen
-        Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
         //refresh the window
         glfwSwapBuffers(window);
         glfwPollEvents();
 
     }
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
     glfwTerminate();
     return 0;
 }
