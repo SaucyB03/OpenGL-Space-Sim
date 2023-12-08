@@ -5,9 +5,24 @@
 #include "EnterValue.h"
 
 
-EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius, float initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : guiObject(position, scale, rsRadius, color, guiShape, scrWidth, scrHeight){
+void EnterValue::updateString(){
+    if(!isnan(fvalue)){
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(2) << fvalue;
+        strText = stream.str();
+    }else if(!empty(svalue)){
+        strText = svalue;
+    }else{
+        strText = "";
+    }
+}
+
+EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, glm::vec3 selCol, guiShape guiShape, float rsRadius, float initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : guiObject(position, scale, rsRadius, color, guiShape, scrWidth, scrHeight){
     this->fvalue = initialValue;
+    this->initialValF = initialValue;
     this->inView = inView;
+    this->origCol = color;
+    this->selCol = selCol;
     this->texCol = texCol;
     this->type = FLOAT;
     this->text = new Text();
@@ -15,9 +30,12 @@ EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, gui
     updateString();
 }
 
-EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, guiShape guiShape, float rsRadius, string initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : guiObject(position, scale, rsRadius, color, guiShape, scrWidth, scrHeight){
+EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, glm::vec3 selCol, guiShape guiShape, float rsRadius, string initialValue, glm::vec3 texCol, bool inView, int scrWidth, int scrHeight) : guiObject(position, scale, rsRadius, color, guiShape, scrWidth, scrHeight){
     this->svalue = initialValue;
+    this->initialValS = initialValue;
     this->inView = inView;
+    this->origCol = color;
+    this->selCol = selCol;
     this->texCol = texCol;
     this->type = STRING;
     this->text = new Text();
@@ -28,6 +46,12 @@ EnterValue::EnterValue(glm::vec2 position, glm::vec2 scale, glm::vec3 color, gui
 void EnterValue::display(Shader* shader, Shader* texShader) {
     if(inView) {
 
+        if(isSelected){
+            color = selCol;
+        }else{
+            color = origCol;
+        }
+
         this->guiObject::display(shader);
 //        updateString();
 
@@ -35,11 +59,11 @@ void EnterValue::display(Shader* shader, Shader* texShader) {
             float texScale = 0.0;
 
             if(scale.x >= scale.y){
-                texScale = scale.x * 2;
+                texScale = scale.x * 3;
             }else{
-                texScale = scale.y * 2;
+                texScale = scale.y * 3;
             }
-            glm::vec2 textPosPix = convertScSpToPix(position);
+            glm::vec2 textPosPix = convertScSpToPix({position.x - scale.x/5, position.y});
             text->RenderText(texShader, strText, textPosPix, texScale, texCol, texAlign);
         }
     }
@@ -76,6 +100,15 @@ bool EnterValue::enter() {
     return true;
 }
 
+void EnterValue::reset() {
+    if(type == FLOAT){
+        fvalue = initialValF;
+    }else{
+        svalue = initialValS;
+    }
+    updateString();
+}
+
 
 bool EnterValue::checkSelect(glm::vec2 mousePos){
 // Convert GLFW input coords to OpenGL Screen Space Coords
@@ -100,20 +133,6 @@ bool EnterValue::selected() {
     return isSelected;
 }
 
-template<typename updt>
-void EnterValue::updateText(updt value) {
-}
-
-template<>
-void EnterValue::updateText(string value) {
-    svalue = value;
-}
-
-template<>
-void EnterValue::updateText(float value) {
-    fvalue = value;
-}
-
 template<typename sbmt>
 sbmt EnterValue::onSubmit() {
     return nullptr;
@@ -132,14 +151,4 @@ string EnterValue::onSubmit() {
 }
 
 
-void EnterValue::updateString(){
-    if(!isnan(fvalue)){
-        std::stringstream stream;
-        stream << std::fixed << std::setprecision(2) << fvalue;
-        strText = stream.str();
-    }else if(!empty(svalue)){
-        strText = svalue;
-    }else{
-        strText = "";
-    }
-}
+

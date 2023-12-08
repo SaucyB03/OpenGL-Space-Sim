@@ -20,29 +20,30 @@ int SC_HEIGHT = 1600;
 Camera* camera;
 
 //Keyboard callback function: checks the user keyinput
-void checkInput(GLFWwindow *window, float deltaTime){
+void checkInput(GLFWwindow *window, GUI* gui, float deltaTime){
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 
-
-    //camera movement:
-    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        camera->move({0.0, 0.0, 1.0}, deltaTime);
-        //object.setVelocity(glm::vec3(0.0,0.0,-0.75));
-    }else if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        camera->move({0.0, 0.0, -1.0}, deltaTime);
-        //object.setVelocity(glm::vec3(0.0,0.0,0.75));
-    }else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera->move({-1.0, 0.0, 0.0}, deltaTime);
-        //object.setVelocity(glm::vec3(-0.75,0.0,0.0));
-    }else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        camera->move({1.0, 0.0, 0.0}, deltaTime);
-    }else if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
-        camera->move({0.0,-1.0,0.0}, deltaTime);
-    }else if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-        camera->move({0.0,1.0,0.0}, deltaTime);
+    if(!gui->getView()){
+        //camera movement:
+        if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+            camera->move({0.0, 0.0, 1.0}, deltaTime);
+            //object.setVelocity(glm::vec3(0.0,0.0,-0.75));
+        }else if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+            camera->move({0.0, 0.0, -1.0}, deltaTime);
+            //object.setVelocity(glm::vec3(0.0,0.0,0.75));
+        }else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera->move({-1.0, 0.0, 0.0}, deltaTime);
+            //object.setVelocity(glm::vec3(-0.75,0.0,0.0));
+        }else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+            camera->move({1.0, 0.0, 0.0}, deltaTime);
+        }else if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
+            camera->move({0.0,-1.0,0.0}, deltaTime);
+        }else if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
+            camera->move({0.0,1.0,0.0}, deltaTime);
+        }
     }
 
 }
@@ -60,19 +61,19 @@ int main(int argc, char** argv){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
 
     //Specifying the monitor to be displayed on + setting the sc size to be fullscreen
     int count;
     GLFWmonitor **monitors = glfwGetMonitors(&count);
-    const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
+    const GLFWvidmode *mode = glfwGetVideoMode(monitors[1]);
     SC_WIDTH = mode->width;
     SC_HEIGHT = mode->height;
     GLFWwindow* window;
-    window = glfwCreateWindow(SC_WIDTH, SC_HEIGHT, "Space Simulation", monitors[0], NULL);
+    window = glfwCreateWindow(SC_WIDTH, SC_HEIGHT, "Space Simulation", monitors[1], NULL);
 
-//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
     //make sure the window was created
@@ -108,7 +109,7 @@ int main(int argc, char** argv){
 
 
     //Define the global camera object
-    camera = new Camera({0.0,0.0,0.0}, {0.0,-1.0,0.0},{0.0,1.0,0.0});
+    camera = new Camera({-40.0,10.0,40.0}, {1.0,0.0,-1.0},{0.0,1.0,0.0});
 
     //Texture Files:
     string sunTex = "../textures/ExaggeratedSunTexture.jpg";
@@ -124,13 +125,12 @@ int main(int argc, char** argv){
     //Index 0 is the sun
     vector<Object*> planets;
 //    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(152.10, 3,0.0), glm::vec3(1.2756,1.2756,1.2756), glm::vec3(0.0,0.0,40.0), 5.9724 * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(152.10, 3,3.0), glm::vec3(0.75,0.75,0.75), glm::vec3(1.0,0.0,40.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
-//    planets.push_back(new Object(glm::vec3(-100.0, 3,3.0), glm::vec3(3,3,3), glm::vec3(0.0,0.0,30.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(152.10, 3,0.0), glm::vec3(1.2756,1.2756,1.2756), glm::vec3(0.0,0.0,100.0), 5.9724 * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(152.10, 3,3.0), glm::vec3(0.75,0.75,0.75), glm::vec3(1.0,0.0,100.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(-100.0, 3,3.0), glm::vec3(3,3,3), glm::vec3(0.0,0.0,90.0), 2.9724 * pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, planetTex, glm::vec2(1.0,1.0), true, SC_WIDTH, SC_HEIGHT));
 
-    planets.push_back(new Object(glm::vec3(0.0, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,0.0), 1988500.0f *pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
-    planets.push_back(new Object(glm::vec3(100, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,40.0), 1988500.0f * pow(10,16), glm::vec3(0.0f, 40.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
-
+    planets.push_back(new Object(glm::vec3(0.0, 0.0,0.0), glm::vec3(12,12,12), glm::vec3(0.0,0.0,0.0), 0.0f* pow(10,16), glm::vec3(0.0f, 0.0f, 0.0f), Shape::Sphere, sunTex, glm::vec2(1.0f,1.0f), false, SC_WIDTH, SC_HEIGHT));
+//    planets.push_back(new Object(glm::vec3(100, 3,0.0), glm::vec3(13.92,13.92,13.92), glm::vec3(0.0,0.0,40.0), 200.0f* pow(10,16), glm::vec3(0.0f, 90.0f, 0.0f), Shape::Sphere, earthTex, glm::vec2(0.181818,0.333333), true, SC_WIDTH, SC_HEIGHT));
 
 
     //Skybox background img object
@@ -144,6 +144,14 @@ int main(int argc, char** argv){
 
     //Game Loop:
     while(!glfwWindowShouldClose(window)){
+
+        if(gui->getView()){
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPosCallback(window, nullptr);
+        }else{
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPosCallback(window, mouseCallback);
+        }
         glEnable(GL_DEPTH_TEST);
         //Calculate deltaTime:
         auto endTime = std::chrono::high_resolution_clock::now();
@@ -156,10 +164,7 @@ int main(int argc, char** argv){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        checkInput(window, deltaTime);
-        gui->checkInput(window);
-
-//                TODO: Implement adding of planets:
+        checkInput(window, gui, deltaTime);
 
 
 
@@ -198,11 +203,17 @@ int main(int argc, char** argv){
         //Apply the camera view (camera position + view direction)
         camera->applyView(shader);
 
+
+
         //Display the Planets
         for(i = 1; i < planets.size(); ++i){
             planets.at(i)->display(shader);
         }
 
+//       Update GUI input and check for submission / adding new planets
+        if(gui->checkInput(window)){
+          planets.push_back(gui->onSubmit(earthTex, planetTex, sunTex, uvTex));
+        }
 
         //Display the Background
         skybox.display(shader);
@@ -214,13 +225,13 @@ int main(int argc, char** argv){
         texShader->setUniformMat4("projection",guiProjection);
 
         gui->RenderGUI(guiShader, texShader);
-        text.RenderText(texShader, "Press . (Period) to toggle GUI", {SC_WIDTH/2, SC_HEIGHT}, 1.0f, glm::vec3(1.0, 1.0f, 1.0f), new Alignment[2]{Center, Top});
+        text.RenderText(texShader, "Press Right-Alt to toggle GUI", {SC_WIDTH/2, SC_HEIGHT}, 1.0f, glm::vec3(1.0, 1.0f, 1.0f), new Alignment[2]{Center, Top});
 
         //refresh the window
         glfwSwapBuffers(window);
         glfwPollEvents();
-
     }
+
     glfwTerminate();
     return 0;
 }

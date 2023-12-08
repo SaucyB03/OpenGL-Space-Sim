@@ -8,6 +8,8 @@ Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up) {
     this->cameraUp = up;
 
     view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    angles.x = glm::degrees(atan2(cameraFront.z, cameraFront.x));
+    angles.y = glm::degrees(asin(cameraFront.y));
 }
 
 Camera::~Camera() {
@@ -56,7 +58,7 @@ void Camera::mouseCallback(GLFWwindow *window, double x, double y) {
     yoffset *= sensitivity;
 
     //update angles based off change in mouse
-    angles.x   += xoffset;
+    angles.x += xoffset;
     angles.y += yoffset;
 
     if(angles.y > 89.0f)

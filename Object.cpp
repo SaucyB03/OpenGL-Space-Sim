@@ -497,7 +497,7 @@ Object::~Object() {
  */
 void Object::move(float deltaTime) {
     //if there is a force on the object, update its velocity size last frame
-    if(currentForce != glm::vec3(0.0f)){
+    if(currentForce != glm::vec3(0.0f) && mass != 0){
         velocity.x += (currentForce.x / mass) * deltaTime;
         velocity.y += (currentForce.y / mass) * deltaTime;
         velocity.z += (currentForce.z / mass) * deltaTime;
@@ -522,6 +522,7 @@ void Object::move(float deltaTime) {
         if(velocity.z != 0){
             position.z += velocity.z * deltaTime;
         }
+
     }
 }
 
@@ -560,13 +561,17 @@ void Object::display(Shader* shader) {
 }
 
 void Object::addForce(glm::vec3 otherObjPos, float otherObjMass) {
-    float dist = 1000000 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
-//    float dist = 100 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
+    glm::vec3 deltas {abs(otherObjPos.x - position.x),abs(otherObjPos.y - position.y),abs(otherObjPos.z - position.z)};
+    float dist = 10000 * sqrt(deltas.x*deltas.x  + deltas.y*deltas.y + deltas.z*deltas.z);
+//    float dist = 1000 * sqrt(otherObjPos.x*otherObjPos.x  + otherObjPos.y*otherObjPos.y + otherObjPos.z*otherObjPos.z);
 
-    float totalForce = UNIVERSAL_GRAVITY_CONSTANT * mass * otherObjMass / (dist*dist);
+    if(dist != 0){
+        float totalForce = UNIVERSAL_GRAVITY_CONSTANT * mass * otherObjMass / (dist*dist);
 
+//        Calculate the force vector of this planet and then add it to the summation
+        currentForce += glm::vec3(totalForce * (otherObjPos.x - position.x), totalForce * (otherObjPos.y - position.y), totalForce * (otherObjPos.z - position.z));
+    }
 
-    currentForce += glm::vec3(totalForce * (otherObjPos.x - position.x), totalForce * (otherObjPos.y - position.y), totalForce * (otherObjPos.z - position.z));
 }
 
 
